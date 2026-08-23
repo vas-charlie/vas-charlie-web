@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>VAŠ CHARLIE | Taxi Zadar i transferi</title>
+
+  <meta name="description" content="VAŠ CHARLIE - pouzdan taxi prijevoz u Zadru, transferi do Zračne luke Zadar, međugradske vožnje i rezervacije unaprijed.">
+
+  <style>
+    :root {
+      --bg: #06121d;
+      --card: #10283a;
+      --gold: #f5c542;
+      --blue: #1689e8;
+      --text: #f7f9fb;
+      --muted: #aab8c5;
+      --line: #28435a;
+      --green: #4dd98b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top right, #12314a 0, transparent 35%),
+        var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .wrap {
+      width: min(1100px, 92%);
+      margin: auto;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      padding: 18px 0;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      font-size: 23px;
+      font-weight: 900;
+    }
+
+    .gold {
+      color: var(--gold);
+    }
+
+    .btn {
+      display: inline-block;
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: var(--gold);
+      color: #07131e;
+      text-decoration: none;
+      font-weight: 900;
+    }
+
+    .btn.outline {
+      background: transparent;
+      color: white;
+      border: 1px solid #49677d;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 20px;
+      padding: 64px 0 28px;
+      align-items: center;
+    }
+
+    .kicker {
+      display: inline-block;
+      background: var(--blue);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-weight: 900;
+    }
+
+    h1 {
+      font-size: clamp(42px, 7vw, 70px);
+      line-height: .96;
+      margin: 18px 0;
+    }
+
+    .lead {
+      font-size: 19px;
+      line-height: 1.55;
+      color: #d6e0e8;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 25px;
+    }
+
+    .card,
+    .service {
+      background: linear-gradient(180deg, var(--card), #0b1e2c);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 23px;
+    }
+
+    .small {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .city {
+      font-size: 38px;
+      font-weight: 900;
+      margin: 8px 0;
+    }
+
+    .status {
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 13px;
+      margin: 18px 0 46px;
+    }
+
+    .service p {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .slogan {
+      margin: 20px 0 48px;
+      text-align: center;
+      border: 1px solid var(--gold);
+      border-radius: 22px;
+      padding: 30px 20px;
+      background: rgba(245, 197, 66, .06);
+    }
+
+    .slogan strong {
+      display: block;
+      color: var(--gold);
+      font-size: clamp(25px, 5vw, 42px);
+      margin-top: 10px;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 30px 0;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 40px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        align-items: flex-start;
+      }
+
+      .brand {
+        font-size: 20px;
+      }
+
+      h1 {
+        font-size: 46px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="wrap">
+      <nav>
+        <div class="brand">
+          VAŠ <span class="gold">CHARLIE</span>
+        </div>
+
+        <a class="btn"
+           href="https://wa.me/385953778808">
+          Rezerviraj taxi
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section class="hero">
+
+      <div>
+        <span class="kicker">TAXI ZADAR</span>
+
+        <h1>
+          Taxi Zadar<br>
+          <span class="gold">VAŠ CHARLIE</span>
+        </h1>
+
+        <p class="lead">
+          Trebate taxi u Zadru? VAŠ CHARLIE nudi pouzdan taxi prijevoz
+          po Zadru, transfere do Zračne luke Zadar, međugradske vožnje
+          i rezervacije unaprijed.
+        </p>
+
+        <div class="actions">
+          <a class="btn"
+             href="https://wa.me/385953778808">
+            WhatsApp rezervacija
+          </a>
+
+          <a class="btn outline"
+             href="tel:+385953778808">
+            +385 95 377 88 08
+          </a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="small">CHARLIE JE TRENUTNO</div>
+
+        <div class="city">ZADAR</div>
+
+        <div class="status">
+          Dostupan za rezervacije
+        </div>
+
+        <p class="small">
+          Taxi i transferi iz Zadra.
+          Gradske vožnje, zračna luka
+          i međugradski prijevoz.
+        </p>
+      </div>
+
+    </section>
+
+    <section class="grid">
+
+      <div class="service">
+        <h3>Taxi Zadar</h3>
+        <p>
+          Taxi prijevoz po Zadru i okolici uz direktan dogovor.
+        </p>
+      </div>
+
+      <div class="service">
+        <h3>Zadar Airport transfer</h3>
+        <p>
+          Transfer do ili iz Zračne luke Zadar uz rezervaciju unaprijed.
+        </p>
+      </div>
+
+      <div class="service">
+        <h3>Međugradski transferi</h3>
+        <p>
+          Zadar – Osijek, Zagreb, Split i druge destinacije po dogovoru.
+        </p>
+      </div>
+
+      <div class="service">
+        <h3>Rezervacija unaprijed</h3>
+        <p>
+          Pošaljite polazište, odredište, datum i vrijeme putem WhatsAppa.
+        </p>
+      </div>
+
+    </section>
+
+    <section class="slogan">
+      VAŠ CHARLIE
+      <strong>DA NIJE VAS, NE BI BILO NI MENE!!</strong>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap">
+      VAŠ CHARLIE • Taxi Zadar • Transferi • Rezervacije
+    </div>
+  </footer>
+
+</body>
+</html>
