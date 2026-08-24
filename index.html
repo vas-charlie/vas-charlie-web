@@ -4,191 +4,176 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>VAŠ CHARLIE | Taxi Zadar i transferi</title>
-
-  <meta name="description" content="VAŠ CHARLIE - pouzdan taxi prijevoz u Zadru, transferi do Zračne luke Zadar, međugradske vožnje i rezervacije unaprijed.">
+  <title>VAŠ CHARLIE OS — Lana</title>
 
   <style>
-    :root {
-      --bg: #06121d;
-      --card: #10283a;
-      --gold: #f5c542;
-      --blue: #1689e8;
-      --text: #f7f9fb;
-      --muted: #aab8c5;
-      --line: #28435a;
-      --green: #4dd98b;
-    }
-
     * {
       box-sizing: border-box;
     }
 
     body {
       margin: 0;
-      background:
-        radial-gradient(circle at top right, #12314a 0, transparent 35%),
-        var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: Arial, sans-serif;
+      background: #07131e;
+      color: #ffffff;
     }
 
-    .wrap {
-      width: min(1100px, 92%);
+    .app {
+      max-width: 700px;
       margin: auto;
+      padding: 20px;
     }
 
-    header {
-      border-bottom: 1px solid var(--line);
-      padding: 18px 0;
-    }
-
-    nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
+    .header {
+      margin-bottom: 24px;
     }
 
     .brand {
-      font-size: 23px;
+      font-size: 28px;
       font-weight: 900;
     }
 
-    .gold {
-      color: var(--gold);
+    .brand span {
+      color: #f5c542;
     }
 
-    .btn {
-      display: inline-block;
-      border-radius: 12px;
-      padding: 13px 18px;
-      background: var(--gold);
-      color: #07131e;
-      text-decoration: none;
-      font-weight: 900;
+    .lana {
+      margin-top: 6px;
+      color: #9fb3c8;
+      font-size: 15px;
     }
 
-    .btn.outline {
-      background: transparent;
-      color: white;
-      border: 1px solid #49677d;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1.25fr .75fr;
-      gap: 20px;
-      padding: 64px 0 28px;
-      align-items: center;
-    }
-
-    .kicker {
-      display: inline-block;
-      background: var(--blue);
-      padding: 7px 14px;
-      border-radius: 8px;
-      font-weight: 900;
+    .card {
+      background: #10283a;
+      border: 1px solid #28435a;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 18px;
     }
 
     h1 {
-      font-size: clamp(42px, 7vw, 70px);
-      line-height: .96;
-      margin: 18px 0;
+      font-size: 28px;
+      margin: 0 0 8px;
     }
 
-    .lead {
-      font-size: 19px;
-      line-height: 1.55;
-      color: #d6e0e8;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 25px;
-    }
-
-    .card,
-    .service {
-      background: linear-gradient(180deg, var(--card), #0b1e2c);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 23px;
-    }
-
-    .small {
-      color: var(--muted);
+    .subtitle {
+      color: #aab8c5;
       line-height: 1.5;
+      margin-bottom: 24px;
     }
 
-    .city {
-      font-size: 38px;
-      font-weight: 900;
-      margin: 8px 0;
-    }
-
-    .status {
-      color: var(--green);
-      font-weight: 900;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 13px;
-      margin: 18px 0 46px;
-    }
-
-    .service p {
-      color: var(--muted);
-      line-height: 1.45;
-    }
-
-    .slogan {
-      margin: 20px 0 48px;
-      text-align: center;
-      border: 1px solid var(--gold);
-      border-radius: 22px;
-      padding: 30px 20px;
-      background: rgba(245, 197, 66, .06);
-    }
-
-    .slogan strong {
+    label {
       display: block;
-      color: var(--gold);
-      font-size: clamp(25px, 5vw, 42px);
-      margin-top: 10px;
+      margin-top: 16px;
+      margin-bottom: 7px;
+      font-weight: 700;
     }
 
-    footer {
-      border-top: 1px solid var(--line);
-      padding: 30px 0;
-      color: var(--muted);
+    input {
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid #49677d;
+      background: #07131e;
+      color: white;
+      font-size: 18px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 17px;
+      border: 0;
+      border-radius: 14px;
+      background: #f5c542;
+      color: #07131e;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .result {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .decision {
       text-align: center;
+      font-size: 34px;
+      font-weight: 900;
+      padding: 18px;
+      border-radius: 16px;
+      margin-bottom: 18px;
     }
 
-    @media (max-width: 760px) {
-      .hero {
+    .good {
+      background: #123d2b;
+      color: #4dd98b;
+      border: 1px solid #4dd98b;
+    }
+
+    .bad {
+      background: #421c1c;
+      color: #ff6b6b;
+      border: 1px solid #ff6b6b;
+    }
+
+    .middle {
+      background: #433815;
+      color: #f5c542;
+      border: 1px solid #f5c542;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat {
+      background: #091b29;
+      padding: 15px;
+      border-radius: 14px;
+    }
+
+    .stat-title {
+      color: #91a5b8;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .lana-answer {
+      margin-top: 18px;
+      padding: 16px;
+      background: #091b29;
+      border-radius: 14px;
+      line-height: 1.5;
+      font-size: 17px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #6f8598;
+      font-size: 13px;
+      padding: 20px 0;
+    }
+
+    @media (max-width: 480px) {
+      .stats {
         grid-template-columns: 1fr;
-        padding-top: 40px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      nav {
-        align-items: flex-start;
-      }
-
-      .brand {
-        font-size: 20px;
       }
 
       h1 {
-        font-size: 46px;
+        font-size: 25px;
+      }
+
+      .decision {
+        font-size: 29px;
       }
     }
   </style>
@@ -196,114 +181,201 @@
 
 <body>
 
-  <header>
-    <div class="wrap">
-      <nav>
-        <div class="brand">
-          VAŠ <span class="gold">CHARLIE</span>
-        </div>
+<div class="app">
 
-        <a class="btn"
-           href="https://wa.me/385953778808">
-          Rezerviraj taxi
-        </a>
-      </nav>
+  <div class="header">
+    <div class="brand">VAŠ <span>CHARLIE</span> OS</div>
+    <div class="lana">Lana — pomoć pri odluci o vožnji</div>
+  </div>
+
+  <div class="card">
+
+    <h1>Isplati li se ova vožnja?</h1>
+
+    <div class="subtitle">
+      Unesi podatke koje vidiš na ponudi. Lana računa cijelo kretanje,
+      a ne samo kilometre s putnikom.
     </div>
-  </header>
 
-  <main class="wrap">
+    <label>Ponuđena zarada (€)</label>
+    <input id="zarada" type="number" step="0.01" placeholder="npr. 25.72">
 
-    <section class="hero">
+    <label>Prazni kilometri do putnika</label>
+    <input id="dolazak" type="number" step="0.1" placeholder="npr. 10">
 
-      <div>
-        <span class="kicker">TAXI ZADAR</span>
+    <label>Kilometri s putnikom</label>
+    <input id="voznja" type="number" step="0.1" placeholder="npr. 11">
 
-        <h1>
-          Taxi Zadar<br>
-          <span class="gold">VAŠ CHARLIE</span>
-        </h1>
+    <label>Mogući prazni povratak (km)</label>
+    <input id="povratak" type="number" step="0.1" placeholder="npr. 10">
 
-        <p class="lead">
-          Trebate taxi u Zadru? VAŠ CHARLIE nudi pouzdan taxi prijevoz
-          po Zadru, transfere do Zračne luke Zadar, međugradske vožnje
-          i rezervacije unaprijed.
-        </p>
+    <label>Ukupno vrijeme (minute)</label>
+    <input id="vrijeme" type="number" step="1" placeholder="npr. 45">
 
-        <div class="actions">
-          <a class="btn"
-             href="https://wa.me/385953778808">
-            WhatsApp rezervacija
-          </a>
+    <label>Procijenjeni trošak vozila po km (€)</label>
+    <input id="trosakKm" type="number" step="0.01" value="0.25">
 
-          <a class="btn outline"
-             href="tel:+385953778808">
-            +385 95 377 88 08
-          </a>
-        </div>
-      </div>
+    <button onclick="izracunaj()">LANA, ISPLATI LI SE?</button>
 
-      <div class="card">
-        <div class="small">CHARLIE JE TRENUTNO</div>
+    <div class="result" id="result">
 
-        <div class="city">ZADAR</div>
+      <div id="decision" class="decision"></div>
 
-        <div class="status">
-          Dostupan za rezervacije
+      <div class="stats">
+
+        <div class="stat">
+          <div class="stat-title">UKUPNO KILOMETARA</div>
+          <div class="stat-value" id="ukupnoKm">0 km</div>
         </div>
 
-        <p class="small">
-          Taxi i transferi iz Zadra.
-          Gradske vožnje, zračna luka
-          i međugradski prijevoz.
-        </p>
+        <div class="stat">
+          <div class="stat-title">TROŠAK VOZILA</div>
+          <div class="stat-value" id="trosak">0 €</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">ZARADA NAKON TROŠKA</div>
+          <div class="stat-value" id="neto">0 €</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">ZARADA PO KM</div>
+          <div class="stat-value" id="poKm">0 €/km</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">ZARADA PO SATU</div>
+          <div class="stat-value" id="poSatu">0 €/h</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">PRAZNI KILOMETRI</div>
+          <div class="stat-value" id="prazniKm">0 km</div>
+        </div>
+
       </div>
 
-    </section>
+      <div class="lana-answer" id="lanaAnswer"></div>
 
-    <section class="grid">
-
-      <div class="service">
-        <h3>Taxi Zadar</h3>
-        <p>
-          Taxi prijevoz po Zadru i okolici uz direktan dogovor.
-        </p>
-      </div>
-
-      <div class="service">
-        <h3>Zadar Airport transfer</h3>
-        <p>
-          Transfer do ili iz Zračne luke Zadar uz rezervaciju unaprijed.
-        </p>
-      </div>
-
-      <div class="service">
-        <h3>Međugradski transferi</h3>
-        <p>
-          Zadar – Osijek, Zagreb, Split i druge destinacije po dogovoru.
-        </p>
-      </div>
-
-      <div class="service">
-        <h3>Rezervacija unaprijed</h3>
-        <p>
-          Pošaljite polazište, odredište, datum i vrijeme putem WhatsAppa.
-        </p>
-      </div>
-
-    </section>
-
-    <section class="slogan">
-      VAŠ CHARLIE
-      <strong>DA NIJE VAS, NE BI BILO NI MENE!!</strong>
-    </section>
-
-  </main>
-
-  <footer>
-    <div class="wrap">
-      VAŠ CHARLIE • Taxi Zadar • Transferi • Rezervacije
     </div>
-  </footer>
+
+  </div>
+
+  <div class="footer">
+    VAŠ CHARLIE • Lana MVP 0.1
+  </div>
+
+</div>
+
+<script>
+
+function broj(id) {
+  return parseFloat(document.getElementById(id).value) || 0;
+}
+
+function euro(n) {
+  return n.toFixed(2).replace(".", ",") + " €";
+}
+
+function izracunaj() {
+
+  const zarada = broj("zarada");
+  const dolazak = broj("dolazak");
+  const voznja = broj("voznja");
+  const povratak = broj("povratak");
+  const vrijeme = broj("vrijeme");
+  const trosakKm = broj("trosakKm");
+
+  if (zarada <= 0 || voznja <= 0 || vrijeme <= 0) {
+    alert("Lana treba barem zaradu, kilometre vožnje i vrijeme.");
+    return;
+  }
+
+  const prazni = dolazak + povratak;
+  const ukupnoKm = dolazak + voznja + povratak;
+
+  const trosak = ukupnoKm * trosakKm;
+  const neto = zarada - trosak;
+
+  const zaradaPoKm = ukupnoKm > 0
+    ? neto / ukupnoKm
+    : 0;
+
+  const sati = vrijeme / 60;
+
+  const zaradaPoSatu = sati > 0
+    ? neto / sati
+    : 0;
+
+  document.getElementById("ukupnoKm").innerText =
+    ukupnoKm.toFixed(1) + " km";
+
+  document.getElementById("trosak").innerText =
+    euro(trosak);
+
+  document.getElementById("neto").innerText =
+    euro(neto);
+
+  document.getElementById("poKm").innerText =
+    zaradaPoKm.toFixed(2).replace(".", ",") + " €/km";
+
+  document.getElementById("poSatu").innerText =
+    zaradaPoSatu.toFixed(2).replace(".", ",") + " €/h";
+
+  document.getElementById("prazniKm").innerText =
+    prazni.toFixed(1) + " km";
+
+  const decision = document.getElementById("decision");
+  const lanaAnswer = document.getElementById("lanaAnswer");
+
+  decision.className = "decision";
+
+  if (zaradaPoSatu >= 30 && zaradaPoKm >= 0.90) {
+
+    decision.innerText = "✅ ISPLATI SE";
+    decision.classList.add("good");
+
+    lanaAnswer.innerHTML =
+      "<strong>Lana:</strong> Charlie, ovo izgleda dobro. " +
+      "Nakon procijenjenog troška ostaje <strong>" +
+      euro(neto) +
+      "</strong>, odnosno oko <strong>" +
+      zaradaPoSatu.toFixed(2).replace(".", ",") +
+      " €/h</strong>.";
+
+  }
+
+  else if (zaradaPoSatu >= 20 && zaradaPoKm >= 0.60) {
+
+    decision.innerText = "⚠️ NA GRANICI";
+    decision.classList.add("middle");
+
+    lanaAnswer.innerHTML =
+      "<strong>Lana:</strong> Može proći, ali nije jaka ponuda. " +
+      "Provjeri kamo te vožnja vodi i kolika je šansa za novu vožnju na odredištu.";
+
+  }
+
+  else {
+
+    decision.innerText = "❌ NE ISPLATI SE";
+    decision.classList.add("bad");
+
+    lanaAnswer.innerHTML =
+      "<strong>Lana:</strong> Ova ponuda trenutno izgleda slabo. " +
+      "Prazni kilometri, vrijeme i trošak vozila previše smanjuju stvarnu zaradu.";
+
+  }
+
+  document.getElementById("result").style.display = "block";
+
+  document.getElementById("result").scrollIntoView({
+    behavior: "smooth"
+  });
+
+}
+
+</script>
 
 </body>
 </html>
