@@ -10,35 +10,62 @@
   <style>
     :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color-scheme:dark}
     *{box-sizing:border-box} body{margin:0;background:#0b1020;color:#f8fafc}
-    main{max-width:720px;margin:auto;padding:20px 16px 56px}
+    main{max-width:760px;margin:auto;padding:20px 16px 64px}
     .brand{font-size:.86rem;letter-spacing:.14em;color:#93c5fd;font-weight:800}
-    h1{font-size:2rem;margin:.35rem 0 .25rem}.sub{color:#cbd5e1;margin:0 0 20px}
+    h1{font-size:2rem;margin:.35rem 0 .25rem}.sub{color:#cbd5e1;margin:0 0 20px;line-height:1.45}
     .card{background:#111827;border:1px solid #334155;border-radius:18px;padding:16px;margin-top:14px}
     .row{display:flex;align-items:center;justify-content:space-between;gap:12px}.row>*{min-width:0}
     h2{font-size:1.05rem;margin:0}.smalltitle{font-size:.9rem;color:#cbd5e1;font-weight:800}
     label{display:block;font-size:.9rem;color:#cbd5e1;margin-bottom:6px}
-    input,select,button{width:100%;font:inherit;border-radius:12px;border:1px solid #475569;min-height:48px}
-    input,select{background:#0f172a;color:#fff;padding:0 12px;margin-bottom:12px}
+    input,select,button,textarea{width:100%;font:inherit;border-radius:12px;border:1px solid #475569;min-height:48px}
+    input,select,textarea{background:#0f172a;color:#fff;padding:0 12px;margin-bottom:12px} textarea{padding:10px 12px;min-height:84px;resize:vertical}
     button{background:#2563eb;color:#fff;font-weight:750;padding:10px 14px;cursor:pointer}
-    button.secondary{background:#1e293b} button.ghost{background:transparent} button.danger{background:#7f1d1d}
+    button.secondary{background:#1e293b} button.ghost{background:transparent} button.danger{background:#7f1d1d} button.success{background:#166534}
     button:disabled{opacity:.55;cursor:not-allowed}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid>*{min-width:0}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.grid>*{min-width:0}.grid3>*{min-width:0}
     .result{font-size:2.2rem;font-weight:850;margin:.25rem 0}.muted{color:#94a3b8;font-size:.9rem}
     .status{min-height:1.5em;margin-top:10px;color:#bfdbfe}.route{font-size:.95rem;line-height:1.5}
     .pill{display:inline-block;background:#172554;color:#bfdbfe;border:1px solid #1d4ed8;border-radius:999px;padding:5px 9px;font-size:.8rem;margin-top:6px}
     .tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}.tabs button{background:#0f172a}.tabs button.active{background:#2563eb}
     details summary{cursor:pointer;font-weight:800}.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.settings-grid>*{min-width:0}
     .note{border-left:3px solid #475569;padding-left:10px;color:#cbd5e1;font-size:.9rem;line-height:1.45}
-    @media(max-width:520px){.grid,.settings-grid{grid-template-columns:1fr}.result{font-size:1.9rem}}
+    .tripbar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;margin:14px 0}.metric{background:#0f172a;border:1px solid #334155;border-radius:14px;padding:12px 8px}.metric strong{display:block;font-size:1.35rem}.metric span{font-size:.78rem;color:#94a3b8}
+    .mapbox{border:1px solid #334155;border-radius:14px;padding:12px;background:#0f172a}.mapline{display:flex;gap:10px;align-items:flex-start}.dot{width:11px;height:11px;border-radius:50%;background:#60a5fa;margin-top:6px;flex:0 0 auto}.dot.end{background:#34d399}.route-note{font-size:.83rem;color:#94a3b8;margin-top:8px}
+    .receipt{white-space:pre-wrap;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85rem;line-height:1.45}
+    .check{display:flex;align-items:center;gap:10px;margin:10px 0}.check input{width:auto;min-height:auto;margin:0}.check label{margin:0;color:#f8fafc}
+    .assistantbar{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.assistantstate{padding:11px 12px;border:1px solid #334155;border-radius:12px;background:#0f172a}.assistantstate strong{display:block}.assistantstate span{font-size:.82rem;color:#94a3b8}
+    .helpgrid{display:grid;gap:10px}.helpitem{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:12px}.helpitem strong{display:block;margin-bottom:4px}.overlay{position:fixed;inset:0;background:rgba(2,6,23,.88);display:grid;place-items:center;padding:18px;z-index:1000}.overlay[hidden]{display:none}.modal{width:min(520px,100%);background:#111827;border:1px solid #475569;border-radius:20px;padding:18px}.modal h2{font-size:1.35rem;margin-bottom:10px}
+    @media(max-width:520px){.grid,.settings-grid,.grid3{grid-template-columns:1fr}.result{font-size:1.9rem}.tripbar{grid-template-columns:1fr 1fr 1fr}.metric strong{font-size:1.1rem}}
   </style>
 </head>
 <body>
+<div class="overlay" id="languageOverlay" hidden>
+  <div class="modal">
+    <div class="brand">LANA • FIRST START</div>
+    <h2 id="languageTitle">Odaberi jezik / Choose language</h2>
+    <p class="sub" id="languageText">Jezik možeš kasnije promijeniti u postavkama.</p>
+    <select id="languageSelect">
+      <option value="hr">Hrvatski</option><option value="en">English</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="fr">Français</option><option value="es">Español</option>
+    </select>
+    <button id="languageContinue" type="button">Nastavi / Continue</button>
+  </div>
+</div>
 <main>
-  <div class="brand">VAŠ CHARLIE • LANA v0.2</div>
+  <div class="brand">VAŠ CHARLIE • LANA v0.5</div>
   <h1>Koliko košta od A do B?</h1>
-  <p class="sub">Cjenik, nagodba i pametnije glasovne naredbe — sve u jednoj Lani.</p>
+  <p class="sub">Poznata Lana za cijenu A→B ostaje baza. Sada joj dodajemo GPS, aktivnu vožnju, glasovnog asistenta, upute, pozive, SMS, internet, glazbu i pripremu naplate — bez gubitka postojećeg cjenika i Nagodbe.</p>
 
-  <section class="card">
+  <section class="card" id="assistantCard">
+    <div class="row"><h2>🎙️ Lana asistent</h2><span class="pill" id="assistantPill">TIHA</span></div>
+    <p class="note">Aktivacija: <strong>“Molim te Lana…”</strong> • prekid i tišina: <strong>“Hvala ti Lana.”</strong> Sama riječ “Lana” ne aktivira asistenta.</p>
+    <div class="assistantbar">
+      <div class="assistantstate"><strong id="assistantState">Hands-free nije uključen</strong><span id="assistantHint">Pritisni uključi jednom; radi dok je aplikacija otvorena i preglednik dopušta mikrofon.</span></div>
+      <button id="toggleAssistant" class="secondary" type="button" style="width:auto;min-width:126px">Uključi</button>
+    </div>
+    <div class="status" id="assistantStatus" aria-live="polite"></div>
+  </section>
+
+  <section class="card" id="setupCard">
     <div class="tabs" aria-label="Način obračuna">
       <button id="modeTariff" class="active" type="button">Taksimetarski cjenik</button>
       <button id="modeDeal" type="button">Nagodba</button>
@@ -47,6 +74,7 @@
     <div id="routeMode">
       <label for="from">Polazište</label>
       <input id="from" autocomplete="street-address" placeholder="npr. Hotel Kolovare, Zadar" />
+      <button id="useCurrentLocation" class="secondary" type="button" style="margin:-4px 0 12px">📍 Koristi moju trenutnu lokaciju</button>
       <label for="to">Odredište</label>
       <input id="to" autocomplete="street-address" placeholder="npr. Zračna luka Zadar" />
       <label for="passengers">Broj putnika</label>
@@ -55,7 +83,7 @@
         <option value="6">5–6 putnika</option>
       </select>
       <div class="grid">
-        <button id="calculate" type="button">Izračunaj cijenu</button>
+        <button id="calculate" type="button">Procijeni rutu i cijenu</button>
         <button id="voice" class="secondary" type="button">🎙️ Reci relaciju</button>
       </div>
     </div>
@@ -77,6 +105,94 @@
     <div class="result" id="price">—</div>
     <div class="route" id="routeInfo"></div>
     <span class="pill" id="tariffInfo"></span>
+    <div style="margin-top:14px">
+      <button id="startTrip" class="success" type="button">▶ Započni vožnju</button>
+    </div>
+  </section>
+
+  <section class="card" id="activeTripCard" hidden>
+    <div class="row"><h2>Aktivna vožnja</h2><span class="pill">GPS aktivan</span></div>
+    <div class="tripbar">
+      <div class="metric"><strong id="liveKm">0,00</strong><span>stvarni km</span></div>
+      <div class="metric"><strong id="liveMin">0</strong><span>minute</span></div>
+      <div class="metric"><strong id="livePrice">0 €</strong><span>trenutna cijena</span></div>
+    </div>
+    <div class="mapbox">
+      <div class="mapline"><span class="dot"></span><div><strong>Najpovoljnija referentna ruta</strong><div id="referenceRoute" class="route"></div></div></div>
+      <div class="route-note">Lana kao referencu bira najkraću razumnu cestovnu rutu koju dobije od rutera. Stvarni GPS kilometri i vrijeme vode se odvojeno.</div>
+    </div>
+    <div class="grid" style="margin-top:14px">
+      <button id="openNavigation" class="secondary" type="button">🧭 Otvori navigaciju</button>
+      <button id="finishTrip" class="danger" type="button">■ Završi vožnju</button>
+    </div>
+    <div class="status" id="tripStatus" aria-live="polite"></div>
+  </section>
+
+  <section class="card" id="checkoutCard" hidden>
+    <h2>Završena vožnja</h2>
+    <div class="tripbar">
+      <div class="metric"><strong id="finalKm">—</strong><span>km</span></div>
+      <div class="metric"><strong id="finalMin">—</strong><span>min</span></div>
+      <div class="metric"><strong id="finalPrice">—</strong><span>za naplatu</span></div>
+    </div>
+
+    <label for="paymentMethod">Način plaćanja</label>
+    <select id="paymentMethod">
+      <option value="gotovina">Gotovina</option>
+      <option value="kartica">Kartica</option>
+      <option value="transakcijski">Transakcijski račun</option>
+      <option value="nenaplaceno">Nije naplaćeno</option>
+    </select>
+
+    <div class="check"><input id="wantFiscal" type="checkbox" /><label for="wantFiscal">Želim fiskalizirati ovu vožnju</label></div>
+    <div class="check"><input id="wantR1" type="checkbox" /><label for="wantR1">Izdaj R1 račun</label></div>
+
+    <div id="r1Fields" hidden>
+      <label for="r1Name">Naziv tvrtke / obrta</label><input id="r1Name" placeholder="Naziv kupca" />
+      <label for="r1Oib">OIB</label><input id="r1Oib" inputmode="numeric" placeholder="OIB kupca" />
+      <label for="r1Address">Adresa</label><input id="r1Address" placeholder="Adresa kupca" />
+    </div>
+
+    <div class="grid3">
+      <button id="printReceipt" class="secondary" type="button">🖨️ Ispiši račun</button>
+      <button id="emailReceipt" class="secondary" type="button">✉️ Pošalji e-mailom</button>
+      <button id="smsReceipt" class="secondary" type="button">💬 Pošalji SMS-om</button>
+    </div>
+    <div class="grid" style="margin-top:10px">
+      <button id="confirmPayment" type="button">Potvrdi naplatu</button>
+      <button id="newTrip" class="ghost" type="button">Nova vožnja</button>
+    </div>
+    <div class="status" id="checkoutStatus" aria-live="polite"></div>
+    <div class="receipt" id="receiptPreview" hidden></div>
+    <p class="note">Fiskalizacija još nije spojena na stvarni fiskalni API. Ako označiš fiskalizaciju, Lana će zabilježiti zahtjev, ali neće poslati račun Poreznoj dok ne spojimo odabrani fiskalni servis. Ispis trenutno koristi sistemski ispis uređaja; izravni Bluetooth printer dodajemo nakon odabira modela.</p>
+  </section>
+
+  <section class="card">
+    <details id="helpDetails">
+      <summary>❓ Upute za korištenje</summary>
+      <div class="helpgrid" style="margin-top:14px">
+        <div class="helpitem"><strong>Glasovno upravljanje</strong><span>Reci “Molim te Lana” i zadatak. Reci “Hvala ti Lana” za prekid razgovora i povratak u tihi način.</span></div>
+        <div class="helpitem"><strong>Ruta i trenutna lokacija</strong><span>Upiši A→B ili koristi “📍 Koristi moju trenutnu lokaciju”. Lana procjenjuje najpovoljniju razumnu cestovnu rutu.</span></div>
+        <div class="helpitem"><strong>Vožnja</strong><span>Procijeni rutu, zatim “Započni vožnju”. Lana mjeri stvarne GPS kilometre i minute. Na kraju odaberi “Završi vožnju”.</span></div>
+        <div class="helpitem"><strong>Naplata</strong><span>Nakon završetka odaberi način plaćanja, R1, ispis ili slanje računa. Stvarna fiskalizacija ostaje ručna dok ne spojimo odabrani fiskalni API.</span></div>
+        <div class="helpitem"><strong>Asistent</strong><span>Podržane radnje u ovoj verziji: pročitaj upute/tekst, pretraži internet, otvori glazbenu pretragu, pokreni poziv/SMS prema spremljenom kontaktu, ruta/vožnja i osnovne naredbe.</span></div>
+      </div>
+      <div class="grid" style="margin-top:12px"><button id="readHelp" type="button">🔊 Pročitaj mi upute</button><button id="stopSpeech" class="secondary" type="button">🔇 Hvala ti Lana</button></div>
+    </details>
+  </section>
+
+  <section class="card">
+    <details>
+      <summary>🌍 Jezik i kontakti</summary>
+      <label for="appLanguage" style="margin-top:14px">Jezik aplikacije</label>
+      <select id="appLanguage"><option value="hr">Hrvatski</option><option value="en">English</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="fr">Français</option><option value="es">Español</option></select>
+      <p class="muted">Jezik se pamti na uređaju. Sustav je pripremljen za dodavanje novih jezika bez mijenjanja osnovne logike.</p>
+      <div class="smalltitle">Brzi kontakti za glasovne pozive/SMS</div>
+      <label for="contactName">Ime</label><input id="contactName" placeholder="npr. Robert" />
+      <label for="contactPhone">Broj telefona</label><input id="contactPhone" inputmode="tel" placeholder="+385…" />
+      <button id="saveContact" class="secondary" type="button">Spremi / ažuriraj kontakt</button>
+      <div id="contactList" class="muted" style="margin-top:10px"></div>
+    </details>
   </section>
 
   <section class="card">
@@ -88,167 +204,230 @@
           <label for="sStartSmall">Start (€)</label><input id="sStartSmall" type="number" min="0" step="0.1" />
           <label for="sFirstSmall">€/km do granice</label><input id="sFirstSmall" type="number" min="0" step="0.1" />
           <label for="sAfterSmall">€/km nakon granice</label><input id="sAfterSmall" type="number" min="0" step="0.1" />
+          <label for="sMinuteSmall">€/min</label><input id="sMinuteSmall" type="number" min="0" step="0.05" />
         </div>
         <div>
           <div class="smalltitle">5–6 putnika</div>
           <label for="sStartBig">Start (€)</label><input id="sStartBig" type="number" min="0" step="0.1" />
           <label for="sFirstBig">€/km do granice</label><input id="sFirstBig" type="number" min="0" step="0.1" />
           <label for="sAfterBig">€/km nakon granice</label><input id="sAfterBig" type="number" min="0" step="0.1" />
+          <label for="sMinuteBig">€/min</label><input id="sMinuteBig" type="number" min="0" step="0.05" />
         </div>
       </div>
       <label for="sThreshold">Granica prve tarife (km)</label>
       <input id="sThreshold" type="number" min="0.5" step="0.5" />
+      <label for="sMinuteMode">Kako se obračunavaju minute</label>
+      <select id="sMinuteMode">
+        <option value="all">Sve minute vožnje</option>
+        <option value="slow">Samo stajanje / spora vožnja</option>
+        <option value="off">Ne naplaćuj minute</option>
+      </select>
+      <label for="sSlowSpeed">Prag spore vožnje (km/h)</label>
+      <input id="sSlowSpeed" type="number" min="1" max="40" step="1" />
       <div class="grid">
         <button id="saveSettings" type="button">Spremi cjenik</button>
         <button id="resetSettings" class="secondary" type="button">Vrati početni</button>
       </div>
-      <p class="muted">Postavke se čuvaju samo na ovom uređaju.</p>
+      <p class="muted">Cijena po minuti je početno 0,00 € dok je sam ne postaviš. Tako Lana ne pretpostavlja tarifu koju još nismo dogovorili.</p>
     </details>
-  </section>
-
-  <section class="card">
-    <div class="muted"><strong>Fiskalizacija — priprema za sljedeću fazu</strong></div>
-    <p class="route">Lana neće automatski fiskalizirati završenu vožnju. Kasnije će vozač ručno potvrditi naplatu i tek tada poslati račun na fiskalizaciju.</p>
   </section>
 </main>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
   const els = {
-    from:$('from'),to:$('to'),passengers:$('passengers'),calculate:$('calculate'),voice:$('voice'),status:$('status'),
-    resultCard:$('resultCard'),price:$('price'),routeInfo:$('routeInfo'),tariffInfo:$('tariffInfo'),resultLabel:$('resultLabel'),
+    setupCard:$('setupCard'),from:$('from'),to:$('to'),passengers:$('passengers'),calculate:$('calculate'),voice:$('voice'),useCurrentLocation:$('useCurrentLocation'),status:$('status'),
+    resultCard:$('resultCard'),price:$('price'),routeInfo:$('routeInfo'),tariffInfo:$('tariffInfo'),resultLabel:$('resultLabel'),startTrip:$('startTrip'),
     modeTariff:$('modeTariff'),modeDeal:$('modeDeal'),routeMode:$('routeMode'),dealMode:$('dealMode'),dealPrice:$('dealPrice'),confirmDeal:$('confirmDeal'),voiceDeal:$('voiceDeal'),
-    sStartSmall:$('sStartSmall'),sFirstSmall:$('sFirstSmall'),sAfterSmall:$('sAfterSmall'),sStartBig:$('sStartBig'),sFirstBig:$('sFirstBig'),sAfterBig:$('sAfterBig'),sThreshold:$('sThreshold'),saveSettings:$('saveSettings'),resetSettings:$('resetSettings')
+    activeTripCard:$('activeTripCard'),liveKm:$('liveKm'),liveMin:$('liveMin'),livePrice:$('livePrice'),referenceRoute:$('referenceRoute'),openNavigation:$('openNavigation'),finishTrip:$('finishTrip'),tripStatus:$('tripStatus'),
+    checkoutCard:$('checkoutCard'),finalKm:$('finalKm'),finalMin:$('finalMin'),finalPrice:$('finalPrice'),paymentMethod:$('paymentMethod'),wantFiscal:$('wantFiscal'),wantR1:$('wantR1'),r1Fields:$('r1Fields'),r1Name:$('r1Name'),r1Oib:$('r1Oib'),r1Address:$('r1Address'),printReceipt:$('printReceipt'),emailReceipt:$('emailReceipt'),smsReceipt:$('smsReceipt'),confirmPayment:$('confirmPayment'),newTrip:$('newTrip'),checkoutStatus:$('checkoutStatus'),receiptPreview:$('receiptPreview'),
+    sStartSmall:$('sStartSmall'),sFirstSmall:$('sFirstSmall'),sAfterSmall:$('sAfterSmall'),sMinuteSmall:$('sMinuteSmall'),sStartBig:$('sStartBig'),sFirstBig:$('sFirstBig'),sAfterBig:$('sAfterBig'),sMinuteBig:$('sMinuteBig'),sThreshold:$('sThreshold'),sMinuteMode:$('sMinuteMode'),sSlowSpeed:$('sSlowSpeed'),saveSettings:$('saveSettings'),resetSettings:$('resetSettings'),
+    languageOverlay:$('languageOverlay'),languageSelect:$('languageSelect'),languageContinue:$('languageContinue'),appLanguage:$('appLanguage'),readHelp:$('readHelp'),stopSpeech:$('stopSpeech'),helpDetails:$('helpDetails'),toggleAssistant:$('toggleAssistant'),assistantPill:$('assistantPill'),assistantState:$('assistantState'),assistantHint:$('assistantHint'),assistantStatus:$('assistantStatus'),contactName:$('contactName'),contactPhone:$('contactPhone'),saveContact:$('saveContact'),contactList:$('contactList')
   };
 
-  const DEFAULTS={threshold:5,small:{start:7,first:3,after:1.5},big:{start:10,first:4,after:2}};
-  let settings=loadSettings();
+  const LANG_VOICE={hr:'hr-HR',en:'en-US',de:'de-DE',it:'it-IT',fr:'fr-FR',es:'es-ES'};
+  const UI={
+    hr:{listen:'Slušam.',quiet:'Tiha sam.',assistantOn:'Hands-free je uključen',assistantOff:'Hands-free nije uključen',activated:'Slušam. Reci što trebaš.',help:'Lana v0.5. Molim te Lana aktivira asistenta. Hvala ti Lana prekida razgovor. Za vožnju odaberi rutu ili trenutnu lokaciju, procijeni rutu i započni vožnju. Lana mjeri stvarne kilometre i minute. Nakon završetka odaberi način plaćanja, račun, R1 ili fiskalizaciju.',saved:'Spremljeno.'},
+    en:{listen:'I am listening.',quiet:'I am quiet.',assistantOn:'Hands-free is on',assistantOff:'Hands-free is off',activated:'I am listening. Tell me what you need.',help:'Lana v0.5. Say Please Lana to activate the assistant. Say Thank you Lana to stop. Choose a route or current location, estimate the route and start the ride. Lana measures actual kilometres and minutes. After the ride choose payment and receipt options.',saved:'Saved.'},
+    de:{listen:'Ich höre zu.',quiet:'Ich bin still.',assistantOn:'Freisprechen ist aktiv',assistantOff:'Freisprechen ist aus',activated:'Ich höre zu. Was soll ich tun?',help:'Lana v0.5. Mit Bitte Lana aktivierst du den Assistenten. Mit Danke Lana beendest du den Dialog. Route wählen, Fahrt starten, Kilometer und Minuten werden gemessen.',saved:'Gespeichert.'},
+    it:{listen:'Ti ascolto.',quiet:'Resto in silenzio.',assistantOn:'Modalità vivavoce attiva',assistantOff:'Modalità vivavoce disattiva',activated:'Ti ascolto. Dimmi cosa devo fare.',help:'Lana v0.5. Di Per favore Lana per attivare l’assistente e Grazie Lana per fermarlo. Seleziona il percorso, avvia la corsa e Lana misura chilometri e minuti.',saved:'Salvato.'},
+    fr:{listen:'Je vous écoute.',quiet:'Je reste silencieuse.',assistantOn:'Mode mains libres activé',assistantOff:'Mode mains libres désactivé',activated:'Je vous écoute. Que dois-je faire ?',help:'Lana v0.5. Dites S’il te plaît Lana pour activer et Merci Lana pour arrêter. Choisissez l’itinéraire, démarrez la course et Lana mesure kilomètres et minutes.',saved:'Enregistré.'},
+    es:{listen:'Te escucho.',quiet:'Me quedo en silencio.',assistantOn:'Manos libres activado',assistantOff:'Manos libres desactivado',activated:'Te escucho. Dime qué necesitas.',help:'Lana v0.5. Di Por favor Lana para activar y Gracias Lana para detener. Elige la ruta, inicia el viaje y Lana mide kilómetros y minutos.',saved:'Guardado.'}
+  };
+  let currentLanguage=localStorage.getItem('lanaLanguage')||'';
+  let assistantEnabled=false,assistantAwake=false,assistantRec=null,assistantRestartTimer=null;
+  let contacts=(()=>{try{return JSON.parse(localStorage.getItem('lanaContacts')||'{}')}catch{return {}}})();
+  function ui(){return UI[currentLanguage]||UI.en}
+  function saveLanguage(lang){currentLanguage=LANG_VOICE[lang]?lang:'en';localStorage.setItem('lanaLanguage',currentLanguage);document.documentElement.lang=currentLanguage;els.appLanguage.value=currentLanguage;els.languageSelect.value=currentLanguage}
+  function firstLanguage(){if(!currentLanguage){const browser=(navigator.language||'en').slice(0,2);saveLanguage(LANG_VOICE[browser]?browser:'en');els.languageOverlay.hidden=false}else saveLanguage(currentLanguage)}
+  function renderContacts(){const keys=Object.keys(contacts);els.contactList.textContent=keys.length?keys.map(k=>`${k}: ${contacts[k]}`).join(' • '):'Nema spremljenih brzih kontakata.'}
+  function saveContact(){const name=els.contactName.value.trim().toLowerCase(),phone=els.contactPhone.value.trim();if(!name||!phone){els.assistantStatus.textContent='Upiši ime i broj.';return}contacts[name]=phone;localStorage.setItem('lanaContacts',JSON.stringify(contacts));renderContacts();els.assistantStatus.textContent=ui().saved}
+  function findContact(name){const key=name.trim().toLowerCase();if(contacts[key])return contacts[key];const hit=Object.keys(contacts).find(k=>key.includes(k)||k.includes(key));return hit?contacts[hit]:null}
+  function assistantStatus(msg){els.assistantStatus.textContent=msg}
+  function silenceAssistant(){assistantAwake=false;speechSynthesis?.cancel();els.assistantPill.textContent='TIHA';els.assistantState.textContent=assistantEnabled?ui().assistantOn:ui().assistantOff;assistantStatus(ui().quiet)}
+  function wakeAssistant(){assistantAwake=true;els.assistantPill.textContent='SLUŠAM';els.assistantState.textContent=ui().activated;assistantStatus(ui().activated);speak(ui().listen)}
+  function cleanAssistantPrefix(text){return text.replace(/^[\s,.]*(molim\s+te\s+lana|please\s+lana|bitte\s+lana|per\s+favore\s+lana|s['’]?il\s+te\s+pla[iî]t\s+lana|por\s+favor\s+lana)[\s,.]*/i,'').trim()}
+  function hasWake(text){return /\b(molim\s+te\s+lana|please\s+lana|bitte\s+lana|per\s+favore\s+lana|s['’]?il\s+te\s+pla[iî]t\s+lana|por\s+favor\s+lana)\b/i.test(text)}
+  function hasSleep(text){return /\b(hvala\s+ti\s+lana|thank\s+you\s+lana|danke\s+lana|grazie\s+lana|merci\s+lana|gracias\s+lana)\b/i.test(text)}
+  function openExternal(url){window.open(url,'_blank','noopener,noreferrer')}
+  function handleAssistantCommand(raw){
+    const text=cleanAssistantPrefix(raw),lower=text.toLowerCase();if(!text){wakeAssistant();return}
+    if(/pročitaj.*uput|read.*instruction|lies.*anleitung/i.test(lower)){els.helpDetails.open=true;speak(ui().help);assistantStatus('Čitam upute.');return}
+    let m=text.match(/(?:pronađi(?:\s+mi)?(?:\s+na\s+internetu)?|pretraži(?:\s+internet)?|search(?:\s+the\s+web)?(?:\s+for)?)[\s:,-]+(.+)/i);if(m){openExternal('https://www.google.com/search?q='+encodeURIComponent(m[1]));assistantStatus('Otvaram internetsku pretragu: '+m[1]);return}
+    m=text.match(/(?:pročitaj(?:\s+mi)?|read(?:\s+to\s+me)?)[\s:,-]+(.+)/i);if(m){speak(m[1]);assistantStatus('Čitam: '+m[1]);return}
+    m=text.match(/(?:pusti(?:\s+mi)?|play)[\s:,-]+(.+)/i);if(m){openExternal('https://music.youtube.com/search?q='+encodeURIComponent(m[1]));assistantStatus('Tražim glazbu: '+m[1]);return}
+    m=text.match(/(?:nazovi(?:\s+mi)?|call)[\s:,-]+(.+)/i);if(m){const phone=findContact(m[1]);if(phone){location.href='tel:'+encodeURIComponent(phone);assistantStatus('Pokrećem poziv: '+m[1])}else assistantStatus('Nemam spremljen broj za: '+m[1]);return}
+    m=text.match(/(?:pošalji\s+(?:sms|poruku)(?:\s+za|\s+osobi|\s+)?|send\s+(?:sms|message)\s+(?:to\s+)?)([^:,-]+)[\s:,-]+(.+)/i);if(m){const phone=findContact(m[1]);if(phone){location.href='sms:'+encodeURIComponent(phone)+'?body='+encodeURIComponent(m[2]);assistantStatus('Pripremila sam SMS za '+m[1]+'. Potvrdi slanje u aplikaciji za poruke.')}else assistantStatus('Nemam spremljen broj za: '+m[1]);return}
+    if(/započni\s+vožnju|start\s+(?:the\s+)?ride/i.test(lower)){startTrip();return}
+    if(/završi\s+vožnju|finish\s+(?:the\s+)?ride/i.test(lower)){finishTrip();return}
+    if(/trenutn.*lokacij|gdje\s+sam|current\s+location/i.test(lower)){useCurrentLocation();return}
+    if(/nagodba/i.test(lower)){const n=(lower.match(/(\d+(?:[.,]\d+)?)/)||[])[1];if(n){setMode('deal');els.dealPrice.value=n.replace(',','.');showDeal();return}}
+    const parsed=parseRouteSpeech(text);if(parsed){setMode('tariff');els.from.value=parsed.from;els.to.value=parsed.to;run();return}
+    if(/prevedi|translate/i.test(lower)){assistantStatus('Prijevod je pripremljen kao modul, ali za stvarni prijevod treba spojiti jezični servis. Neću izmišljati prijevod.');speak('Za stvarni prijevod trebam spojiti jezični servis.');return}
+    assistantStatus('Čula sam naredbu, ali je još nemam u ovoj verziji: '+text)
+  }
+  function processAssistantTranscript(text){assistantStatus('Čula sam: '+text);if(hasSleep(text)){silenceAssistant();return}if(hasWake(text)){assistantAwake=true;const cmd=cleanAssistantPrefix(text);if(cmd)handleAssistantCommand(text);else wakeAssistant();return}if(assistantAwake)handleAssistantCommand(text)}
+  function startAssistantRecognition(){if(!SR){assistantStatus('Ovaj preglednik ne podržava prepoznavanje govora.');return}if(assistantRec)try{assistantRec.abort()}catch{};assistantRec=new SR();assistantRec.lang=LANG_VOICE[currentLanguage]||'hr-HR';assistantRec.continuous=true;assistantRec.interimResults=false;assistantRec.maxAlternatives=1;assistantRec.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)processAssistantTranscript(e.results[i][0].transcript.trim())};assistantRec.onerror=e=>{if(e.error!=='aborted'&&e.error!=='no-speech')assistantStatus('Mikrofon: '+e.error)};assistantRec.onend=()=>{assistantRec=null;if(assistantEnabled){clearTimeout(assistantRestartTimer);assistantRestartTimer=setTimeout(startAssistantRecognition,700)}};try{assistantRec.start();assistantEnabled=true;els.toggleAssistant.textContent='Isključi';els.assistantPill.textContent='TIHA';els.assistantState.textContent=ui().assistantOn;assistantStatus('Čekam “Molim te Lana…”.')}catch{assistantStatus('Mikrofon se nije mogao pokrenuti.')}
+  }
+  function stopAssistantRecognition(){assistantEnabled=false;assistantAwake=false;clearTimeout(assistantRestartTimer);if(assistantRec)try{assistantRec.abort()}catch{};assistantRec=null;els.toggleAssistant.textContent='Uključi';els.assistantPill.textContent='TIHA';els.assistantState.textContent=ui().assistantOff;assistantStatus(ui().quiet)}
 
+  const DEFAULTS={threshold:5,minuteMode:'slow',slowSpeed:10,small:{start:7,first:3,after:1.5,minute:0},big:{start:10,first:4,after:2,minute:0}};
+  let settings=loadSettings();
+  let mode='tariff';
+  let lastEstimate=null;
+  let currentOrigin=null;
+  let trip={active:false,startAt:null,watchId:null,lastPos:null,km:0,slowMs:0,lastSampleAt:null,deal:null,reference:null};
+
+  function cloneDefaults(){return JSON.parse(JSON.stringify(DEFAULTS))}
   function loadSettings(){
     try{
-      const raw=localStorage.getItem('lanaTariffV02');
-      const p=raw?JSON.parse(raw):null;
-      if(!p) return structuredClone(DEFAULTS);
+      const raw=localStorage.getItem('lanaTariffV03')||localStorage.getItem('lanaTariffV02');
+      const p=raw?JSON.parse(raw):null;if(!p) return cloneDefaults();
       return {
-        threshold:Number(p.threshold)||DEFAULTS.threshold,
-        small:{start:Number(p.small?.start)??7,first:Number(p.small?.first)??3,after:Number(p.small?.after)??1.5},
-        big:{start:Number(p.big?.start)??10,first:Number(p.big?.first)??4,after:Number(p.big?.after)??2}
+        threshold:Number(p.threshold)||DEFAULTS.threshold,minuteMode:['all','slow','off'].includes(p.minuteMode)?p.minuteMode:DEFAULTS.minuteMode,slowSpeed:Number(p.slowSpeed)||DEFAULTS.slowSpeed,
+        small:{start:numOr(p.small?.start,7),first:numOr(p.small?.first,3),after:numOr(p.small?.after,1.5),minute:numOr(p.small?.minute,0)},
+        big:{start:numOr(p.big?.start,10),first:numOr(p.big?.first,4),after:numOr(p.big?.after,2),minute:numOr(p.big?.minute,0)}
       };
-    }catch{return structuredClone(DEFAULTS)}
+    }catch{return cloneDefaults()}
   }
+  function numOr(v,f){const n=Number(v);return Number.isFinite(n)?n:f}
   function setStatus(msg){els.status.textContent=msg}
-  function speak(text){if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='hr-HR';speechSynthesis.speak(u)}}
+  function setTripStatus(msg){els.tripStatus.textContent=msg}
+  function setCheckoutStatus(msg){els.checkoutStatus.textContent=msg}
+  function speak(text){if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=LANG_VOICE[currentLanguage]||'en-US';speechSynthesis.speak(u)}}
+  function money(n,max=2){return Number(n).toLocaleString('hr-HR',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:max})}
   function fillSettings(){
-    els.sThreshold.value=settings.threshold;
-    els.sStartSmall.value=settings.small.start;els.sFirstSmall.value=settings.small.first;els.sAfterSmall.value=settings.small.after;
-    els.sStartBig.value=settings.big.start;els.sFirstBig.value=settings.big.first;els.sAfterBig.value=settings.big.after;
+    els.sThreshold.value=settings.threshold;els.sMinuteMode.value=settings.minuteMode;els.sSlowSpeed.value=settings.slowSpeed;
+    els.sStartSmall.value=settings.small.start;els.sFirstSmall.value=settings.small.first;els.sAfterSmall.value=settings.small.after;els.sMinuteSmall.value=settings.small.minute;
+    els.sStartBig.value=settings.big.start;els.sFirstBig.value=settings.big.first;els.sAfterBig.value=settings.big.after;els.sMinuteBig.value=settings.big.minute;
   }
   function readNum(input,min=0){const n=Number(input.value);return Number.isFinite(n)&&n>=min?n:null}
   function saveSettings(){
-    const vals={
-      threshold:readNum(els.sThreshold,.5),
-      small:{start:readNum(els.sStartSmall),first:readNum(els.sFirstSmall),after:readNum(els.sAfterSmall)},
-      big:{start:readNum(els.sStartBig),first:readNum(els.sFirstBig),after:readNum(els.sAfterBig)}
-    };
-    if(vals.threshold===null||Object.values(vals.small).some(v=>v===null)||Object.values(vals.big).some(v=>v===null)){setStatus('Provjeri vrijednosti cjenika.');return}
-    settings=vals;localStorage.setItem('lanaTariffV02',JSON.stringify(settings));setStatus('Cjenik je spremljen.');speak('Cjenik je spremljen.');
+    const vals={threshold:readNum(els.sThreshold,.5),minuteMode:els.sMinuteMode.value,slowSpeed:readNum(els.sSlowSpeed,1),small:{start:readNum(els.sStartSmall),first:readNum(els.sFirstSmall),after:readNum(els.sAfterSmall),minute:readNum(els.sMinuteSmall)},big:{start:readNum(els.sStartBig),first:readNum(els.sFirstBig),after:readNum(els.sAfterBig),minute:readNum(els.sMinuteBig)}};
+    if(vals.threshold===null||vals.slowSpeed===null||Object.values(vals.small).some(v=>v===null)||Object.values(vals.big).some(v=>v===null)){setStatus('Provjeri vrijednosti cjenika.');return}
+    settings=vals;localStorage.setItem('lanaTariffV03',JSON.stringify(settings));setStatus('Cjenik je spremljen.');speak('Cjenik je spremljen.');
   }
-  function calcPrice(km,pax){
-    const big=Number(pax)>4, t=big?settings.big:settings.small, limit=settings.threshold;
-    const value=km<=limit?t.start+km*t.first:t.start+limit*t.first+(km-limit)*t.after;
-    return {raw:value,rounded:Math.round(value),big};
+  function tariffFor(pax){return Number(pax)>4?settings.big:settings.small}
+  function kmCharge(km,pax){const t=tariffFor(pax),limit=settings.threshold;return km<=limit?t.start+km*t.first:t.start+limit*t.first+(km-limit)*t.after}
+  function minuteCharge(minutes,pax){return Math.max(0,minutes)*tariffFor(pax).minute}
+  function calcEstimate(km,minutes,pax){return kmCharge(km,pax)+minuteCharge(settings.minuteMode==='all'?minutes:0,pax)}
+  function calcLivePrice(){if(mode==='deal'&&trip.deal!=null)return trip.deal;const elapsedMin=(Date.now()-trip.startAt)/60000;const billMin=settings.minuteMode==='all'?elapsedMin:settings.minuteMode==='slow'?trip.slowMs/60000:0;return kmCharge(trip.km,els.passengers.value)+minuteCharge(billMin,els.passengers.value)}
+
+
+  function getCurrentPosition(){
+    return new Promise((resolve,reject)=>{
+      if(!navigator.geolocation){reject(new Error('GPS nije podržan na ovom uređaju.'));return}
+      navigator.geolocation.getCurrentPosition(pos=>resolve({lat:pos.coords.latitude,lon:pos.coords.longitude,accuracy:pos.coords.accuracy}),err=>{
+        const msg=err.code===1?'Dopusti Lani pristup lokaciji.':err.code===2?'Trenutna lokacija nije dostupna.':'GPS nije odgovorio na vrijeme.';
+        reject(new Error(msg));
+      },{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
+    });
   }
+  async function reverseGeocode(p){
+    try{
+      const url=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(p.lat)}&lon=${encodeURIComponent(p.lon)}&zoom=18&addressdetails=1`;
+      const r=await fetch(url,{headers:{'Accept':'application/json','Accept-Language':'hr'}});if(!r.ok)throw new Error();
+      const data=await r.json();return data.display_name||'Moja trenutna lokacija';
+    }catch{return 'Moja trenutna lokacija'}
+  }
+  async function useCurrentLocation(){
+    els.useCurrentLocation.disabled=true;setStatus('Tražim tvoju trenutnu lokaciju…');
+    try{
+      const p=await getCurrentPosition();currentOrigin={lat:p.lat,lon:p.lon,name:await reverseGeocode(p)};els.from.value=currentOrigin.name;setStatus(`Lokacija pronađena${p.accuracy?` • preciznost oko ${Math.round(p.accuracy)} m`:''}.`);speak('Pronašla sam tvoju trenutnu lokaciju.');
+    }catch(e){setStatus(e.message||'Ne mogu odrediti trenutnu lokaciju.')}finally{els.useCurrentLocation.disabled=false}
+  }
+  function isCurrentLocationText(text){return /^(moja trenutna lokacija|trenutna lokacija|odavde|ovdje)$/i.test(text.trim())}
 
   function candidateQueries(q){
-    const raw=q.trim().replace(/[?.!,]+$/g,'');
-    const out=[raw];
-    let x=raw.toLowerCase()
-      .replace(/^iz\s+/,'').replace(/^s\s+/,'').replace(/^sa\s+/,'')
-      .replace(/^kod\s+/,'').replace(/^do\s+/,'')
-      .replace(/\bhotela\b/g,'hotel')
-      .replace(/\bzračne\s+luke\b/g,'zračna luka')
-      .replace(/\baerodroma\b/g,'aerodrom')
-      .replace(/\bkolovara\b/g,'kolovare');
-    if(x!==raw.toLowerCase()) out.push(x);
-    if(!/\b(hrvatska|croatia)\b/i.test(raw)) out.push(raw+', Hrvatska');
-    if(!/\bzadar\b/i.test(raw) && /kolovare|zračna luka|aerodrom/i.test(raw)) out.push(x+', Zadar');
-    return [...new Set(out)];
+    const raw=q.trim().replace(/[?.!,]+$/g,'');const out=[raw];
+    let x=raw.toLowerCase().replace(/^iz\s+/,'').replace(/^s\s+/,'').replace(/^sa\s+/,'').replace(/^kod\s+/,'').replace(/^do\s+/,'')
+      .replace(/\bhotela\b/g,'hotel').replace(/\bzračne\s+luke\b/g,'zračna luka').replace(/\baerodroma\b/g,'aerodrom').replace(/\bkolovara\b/g,'kolovare').replace(/\bu zadru\b/g,'Zadar');
+    if(x!==raw.toLowerCase()) out.push(x);if(!/\b(hrvatska|croatia)\b/i.test(raw)) out.push(raw+', Hrvatska');if(!/\bzadar\b/i.test(raw)&&/kolovare|zračna luka|aerodrom/i.test(raw)) out.push(x+', Zadar');return [...new Set(out)];
   }
-
-  async function geocode(query){
-    let last=query;
-    for(const q of candidateQueries(query)){
-      last=q;
-      const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=hr&q='+encodeURIComponent(q);
-      const r=await fetch(url,{headers:{'Accept':'application/json','Accept-Language':'hr'}});
-      if(!r.ok) continue;
-      const data=await r.json();
-      if(data.length) return {lat:Number(data[0].lat),lon:Number(data[0].lon),name:data[0].display_name};
-    }
-    throw new Error('Lokacija nije pronađena: '+query);
-  }
+  async function geocode(query){for(const q of candidateQueries(query)){const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=3&countrycodes=hr&q='+encodeURIComponent(q);const r=await fetch(url,{headers:{'Accept':'application/json','Accept-Language':'hr'}});if(!r.ok)continue;const data=await r.json();if(data.length)return{lat:Number(data[0].lat),lon:Number(data[0].lon),name:data[0].display_name}}throw new Error('Lokacija nije pronađena: '+query)}
   async function route(a,b){
-    const url=`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false&alternatives=false&steps=false`;
-    const r=await fetch(url);if(!r.ok) throw new Error('Ne mogu izračunati rutu.');
-    const data=await r.json();if(data.code!=='Ok'||!data.routes?.length) throw new Error('Ruta nije pronađena.');
-    return {km:data.routes[0].distance/1000,minutes:data.routes[0].duration/60};
+    const url=`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false&alternatives=true&steps=false`;
+    const r=await fetch(url);if(!r.ok)throw new Error('Ne mogu izračunati rutu.');const data=await r.json();if(data.code!=='Ok'||!data.routes?.length)throw new Error('Ruta nije pronađena.');
+    const routes=data.routes.map(x=>({km:x.distance/1000,minutes:x.duration/60}));routes.sort((x,y)=>x.km-y.km||x.minutes-y.minutes);return{best:routes[0],alternatives:routes};
   }
   async function run(){
     const aText=els.from.value.trim(),bText=els.to.value.trim();if(!aText||!bText){setStatus('Upiši polazište i odredište.');return}
     els.calculate.disabled=true;els.voice.disabled=true;els.resultCard.hidden=true;
-    try{
-      setStatus('Tražim polazište…');const a=await geocode(aText);
-      setStatus('Tražim odredište…');const b=await geocode(bText);
-      setStatus('Računam cestovnu rutu…');const r=await route(a,b);const p=calcPrice(r.km,els.passengers.value);
-      els.resultLabel.textContent='Procijenjena cijena';
-      els.price.textContent=p.rounded.toLocaleString('hr-HR',{style:'currency',currency:'EUR',maximumFractionDigits:0});
-      els.routeInfo.textContent=`${r.km.toFixed(1)} km • oko ${Math.round(r.minutes)} min`;
-      els.tariffInfo.textContent=p.big?'Tarifa 5–6 putnika':'Tarifa 1–4 putnika';els.resultCard.hidden=false;setStatus('Gotovo.');speak(`Procijenjena cijena je ${p.rounded} eura.`);
-    }catch(e){setStatus(e.message||'Došlo je do greške.')}finally{els.calculate.disabled=false;els.voice.disabled=false}
+    try{setStatus('Tražim polazište…');let a;if(isCurrentLocationText(aText)){const p=await getCurrentPosition();a={lat:p.lat,lon:p.lon,name:'Moja trenutna lokacija'};currentOrigin=a}else if(currentOrigin&&aText===currentOrigin.name){a=currentOrigin}else{a=await geocode(aText);}setStatus('Tražim odredište…');const b=await geocode(bText);setStatus('Tražim najpovoljniju cestovnu rutu…');const rr=await route(a,b);const r=rr.best;const price=calcEstimate(r.km,r.minutes,els.passengers.value);lastEstimate={a,b,route:r,price};els.resultLabel.textContent='Procijenjena cijena';els.price.textContent=money(Math.round(price),0);els.routeInfo.textContent=`${r.km.toFixed(1)} km • oko ${Math.round(r.minutes)} min • najpovoljnija referentna ruta`;els.tariffInfo.textContent=Number(els.passengers.value)>4?'Tarifa 5–6 putnika':'Tarifa 1–4 putnika';els.resultCard.hidden=false;setStatus('Gotovo.');speak(`Procijenjena cijena je ${Math.round(price)} eura.`)}catch(e){setStatus(e.message||'Došlo je do greške.')}finally{els.calculate.disabled=false;els.voice.disabled=false}
   }
+  function showDeal(){const n=Number(els.dealPrice.value);if(!Number.isFinite(n)||n<=0){setStatus('Upiši iznos nagodbe.');return}trip.deal=n;els.resultLabel.textContent='Nagodba';els.price.textContent=money(n);els.routeInfo.textContent='Dogovorena cijena — stvarni kilometri i minute i dalje će se mjeriti.';els.tariffInfo.textContent='NAGODBA';els.resultCard.hidden=false;setStatus('Nagodba potvrđena.');speak(`Nagodba ${n.toLocaleString('hr-HR')} eura. Potvrđeno.`)}
+  function setMode(next){mode=next;const deal=next==='deal';els.routeMode.hidden=deal;els.dealMode.hidden=!deal;els.modeDeal.classList.toggle('active',deal);els.modeTariff.classList.toggle('active',!deal);els.resultCard.hidden=true;setStatus('')}
 
-  function showDeal(){
-    const n=Number(els.dealPrice.value);if(!Number.isFinite(n)||n<=0){setStatus('Upiši iznos nagodbe.');return}
-    els.resultLabel.textContent='Nagodba';els.price.textContent=n.toLocaleString('hr-HR',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:2});
-    els.routeInfo.textContent='Dogovorena cijena — bez obračuna kilometraže.';els.tariffInfo.textContent='NAGODBA';els.resultCard.hidden=false;setStatus('Nagodba potvrđena.');speak(`Nagodba ${n.toLocaleString('hr-HR')} eura. Potvrđeno.`);
+  function haversine(a,b){const R=6371,rad=x=>x*Math.PI/180,dLat=rad(b.lat-a.lat),dLon=rad(b.lon-a.lon),q=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(q))}
+  function beginGps(){
+    if(!navigator.geolocation){setTripStatus('GPS nije podržan na ovom uređaju.');return false}
+    trip.watchId=navigator.geolocation.watchPosition(pos=>{
+      const now=Date.now(),p={lat:pos.coords.latitude,lon:pos.coords.longitude,accuracy:pos.coords.accuracy};
+      if(trip.lastPos&&p.accuracy<=80){const d=haversine(trip.lastPos,p);if(d<1){trip.km+=d;const dt=now-(trip.lastSampleAt||now);const speed=dt>0?(d/(dt/3600000)):0;if(settings.minuteMode==='slow'&&speed<=settings.slowSpeed)trip.slowMs+=dt}}
+      trip.lastPos=p;trip.lastSampleAt=now;updateTripUi();
+    },err=>setTripStatus('GPS: '+(err.message||'nije dostupan.')),{enableHighAccuracy:true,maximumAge:3000,timeout:15000});return true;
   }
-  function setMode(mode){
-    const deal=mode==='deal';els.routeMode.hidden=deal;els.dealMode.hidden=!deal;els.modeDeal.classList.toggle('active',deal);els.modeTariff.classList.toggle('active',!deal);els.resultCard.hidden=true;setStatus('');
+  function updateTripUi(){if(!trip.active)return;const min=(Date.now()-trip.startAt)/60000;els.liveKm.textContent=trip.km.toLocaleString('hr-HR',{minimumFractionDigits:2,maximumFractionDigits:2});els.liveMin.textContent=Math.max(0,Math.floor(min)).toString();els.livePrice.textContent=money(calcLivePrice());}
+  let tripTimer=null;
+  function startTrip(){
+    if(mode==='tariff'&&!lastEstimate){setStatus('Prvo procijeni rutu.');return}
+    if(mode==='deal'&&trip.deal==null){setStatus('Prvo potvrdi nagodbu.');return}
+    trip.active=true;trip.startAt=Date.now();trip.km=0;trip.slowMs=0;trip.lastPos=null;trip.lastSampleAt=null;trip.reference=lastEstimate?.route||null;
+    els.setupCard.hidden=true;els.resultCard.hidden=true;els.activeTripCard.hidden=false;els.checkoutCard.hidden=true;
+    els.referenceRoute.textContent=trip.reference?`${trip.reference.km.toFixed(1)} km • oko ${Math.round(trip.reference.minutes)} min`:'Nagodba — ruta nije obavezna.';
+    beginGps();tripTimer=setInterval(updateTripUi,1000);updateTripUi();setTripStatus('Vožnja je započeta. Lana mjeri stvarne kilometre i vrijeme.');speak('Vožnja je započeta.');
   }
+  function finishTrip(){
+    if(!trip.active)return;trip.active=false;if(trip.watchId!=null)navigator.geolocation.clearWatch(trip.watchId);trip.watchId=null;if(tripTimer)clearInterval(tripTimer);tripTimer=null;
+    const minutes=Math.max(0,(Date.now()-trip.startAt)/60000),price=calcLivePrice();trip.final={km:trip.km,minutes,price};els.activeTripCard.hidden=true;els.checkoutCard.hidden=false;els.finalKm.textContent=trip.km.toLocaleString('hr-HR',{minimumFractionDigits:2,maximumFractionDigits:2});els.finalMin.textContent=Math.max(1,Math.round(minutes)).toString();els.finalPrice.textContent=money(price);buildReceipt();setCheckoutStatus('Vožnja završena. Odaberi način plaćanja i potvrdi naplatu.');speak(`Vožnja završena. Za naplatu ${price.toFixed(0)} eura.`)
+  }
+  function openNavigation(){if(!els.to.value.trim()){setTripStatus('Nema odredišta za navigaciju.');return}const q=encodeURIComponent(els.to.value.trim());location.href=`https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=driving`}
 
-  function parsePassengers(lower){
-    if(/(pet|šest|5|6)\s+(putnika|osoba)/.test(lower)) els.passengers.value='6';
-    else if(/(jedan|jedna|jednog|dva|dvije|tri|četiri|1|2|3|4)\s+(putnika|osoba)/.test(lower)) els.passengers.value='4';
-  }
+  function buildReceipt(){if(!trip.final)return'';const r1=els.wantR1.checked?`\nR1: DA\nKupac: ${els.r1Name.value||'—'}\nOIB: ${els.r1Oib.value||'—'}\nAdresa: ${els.r1Address.value||'—'}`:'';const fiscal=els.wantFiscal.checked?'DA — čeka spajanje fiskalnog API-ja':'NE';const txt=`VAŠ CHARLIE • LANA v0.5\n\nVožnja\nKm: ${trip.final.km.toFixed(2)}\nVrijeme: ${Math.round(trip.final.minutes)} min\nIznos: ${money(trip.final.price)}\nPlaćanje: ${els.paymentMethod.value}\nFiskalizacija: ${fiscal}${r1}`;els.receiptPreview.textContent=txt;els.receiptPreview.hidden=false;return txt}
+  function confirmPayment(){if(!trip.final)return;buildReceipt();if(els.paymentMethod.value==='nenaplaceno'){els.wantFiscal.checked=false;setCheckoutStatus('Vožnja je označena kao nenaplaćena. Fiskalizacija nije pokrenuta.');return}if(els.wantFiscal.checked)setCheckoutStatus('Naplata potvrđena. Fiskalizacija je označena, ali API još nije povezan.');else setCheckoutStatus('Naplata potvrđena. Fiskalizacija nije zatražena.');}
+  function printReceipt(){buildReceipt();window.print()}
+  function emailReceipt(){const body=encodeURIComponent(buildReceipt());location.href=`mailto:?subject=${encodeURIComponent('Račun za taxi vožnju')}&body=${body}`}
+  function smsReceipt(){const body=encodeURIComponent(buildReceipt());location.href=`sms:?body=${body}`}
+  function resetTrip(){trip={active:false,startAt:null,watchId:null,lastPos:null,km:0,slowMs:0,lastSampleAt:null,deal:null,reference:null};lastEstimate=null;els.checkoutCard.hidden=true;els.activeTripCard.hidden=true;els.setupCard.hidden=false;els.resultCard.hidden=true;els.receiptPreview.hidden=true;els.wantFiscal.checked=false;els.wantR1.checked=false;els.r1Fields.hidden=true;setStatus('Spremna za novu vožnju.');}
+
+  function parsePassengers(lower){if(/(pet|šest|5|6)\s+(putnika|osoba)/.test(lower))els.passengers.value='6';else if(/(jedan|jedna|jednog|dva|dvije|tri|četiri|1|2|3|4)\s+(putnika|osoba)/.test(lower))els.passengers.value='4'}
   function cleanPlace(s){return s.trim().replace(/[?.!,]+$/g,'').replace(/^(iz|sa|s)\s+/i,'')}
-  function parseRouteSpeech(text){
-    const lower=text.toLowerCase();parsePassengers(lower);
-    let cleaned=text.replace(/^lana[,.]?\s*/i,'').replace(/koliko\s+(?:bi\s+)?(?:košta|koštalo)\s*/i,'').replace(/koliko\s+do\s+/i,'odavde do ');
-    cleaned=cleaned.replace(/\s+za\s+(?:\w+|\d+)\s+(?:putnika|osoba)\s*$/i,'');
-    const m=cleaned.match(/(?:od|iz)\s+(.+?)\s+do\s+(.+)$/i);
-    if(!m) return null;
-    return {from:cleanPlace(m[1]),to:cleanPlace(m[2])};
-  }
+  function parseRouteSpeech(text){const lower=text.toLowerCase();parsePassengers(lower);let cleaned=text.replace(/^(?:molim\s+te\s+lana|lana)[,.]?\s*/i,'').replace(/koliko\s+(?:bi\s+)?(?:košta|koštalo)\s*/i,'').replace(/koliko\s+do\s+/i,'odavde do ');cleaned=cleaned.replace(/\s+za\s+(?:\w+|\d+)\s+(?:putnika|osoba)\s*$/i,'');const fromHere=cleaned.match(/(?:odavde|od ovdje|s ove lokacije|sa ove lokacije)\s+do\s+(.+)$/i);if(fromHere)return{from:'Moja trenutna lokacija',to:cleanPlace(fromHere[1])};const m=cleaned.match(/(?:od|iz)\s+(.+?)\s+do\s+(.+)$/i);if(!m)return null;return{from:cleanPlace(m[1]),to:cleanPlace(m[2])}}
 
-  els.calculate.addEventListener('click',run);els.confirmDeal.addEventListener('click',showDeal);
-  els.modeTariff.addEventListener('click',()=>setMode('tariff'));els.modeDeal.addEventListener('click',()=>setMode('deal'));
-  els.saveSettings.addEventListener('click',saveSettings);els.resetSettings.addEventListener('click',()=>{settings=structuredClone(DEFAULTS);localStorage.setItem('lanaTariffV02',JSON.stringify(settings));fillSettings();setStatus('Vraćen je početni cjenik.');});
+  els.calculate.addEventListener('click',run);els.useCurrentLocation.addEventListener('click',useCurrentLocation);els.confirmDeal.addEventListener('click',showDeal);els.modeTariff.addEventListener('click',()=>setMode('tariff'));els.modeDeal.addEventListener('click',()=>setMode('deal'));
+  els.startTrip.addEventListener('click',startTrip);els.finishTrip.addEventListener('click',finishTrip);els.openNavigation.addEventListener('click',openNavigation);els.confirmPayment.addEventListener('click',confirmPayment);els.printReceipt.addEventListener('click',printReceipt);els.emailReceipt.addEventListener('click',emailReceipt);els.smsReceipt.addEventListener('click',smsReceipt);els.newTrip.addEventListener('click',resetTrip);els.wantR1.addEventListener('change',()=>{els.r1Fields.hidden=!els.wantR1.checked;buildReceipt()});els.paymentMethod.addEventListener('change',buildReceipt);els.wantFiscal.addEventListener('change',buildReceipt);
+  els.saveSettings.addEventListener('click',saveSettings);els.resetSettings.addEventListener('click',()=>{settings=cloneDefaults();localStorage.setItem('lanaTariffV03',JSON.stringify(settings));fillSettings();setStatus('Vraćen je početni cjenik.');});
+  els.languageContinue.addEventListener('click',()=>{saveLanguage(els.languageSelect.value);els.languageOverlay.hidden=true;speak(ui().listen)});
+  els.appLanguage.addEventListener('change',()=>{saveLanguage(els.appLanguage.value);if(assistantEnabled){stopAssistantRecognition();startAssistantRecognition()}assistantStatus(ui().saved)});
+  els.readHelp.addEventListener('click',()=>speak(ui().help));els.stopSpeech.addEventListener('click',silenceAssistant);
+  els.saveContact.addEventListener('click',saveContact);els.toggleAssistant.addEventListener('click',()=>assistantEnabled?stopAssistantRecognition():startAssistantRecognition());
 
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  function listenRoute(){
-    const rec=new SR();rec.lang='hr-HR';rec.interimResults=false;rec.maxAlternatives=1;setStatus('Slušam… reci prirodno relaciju.');
-    rec.onresult=ev=>{const text=ev.results[0][0].transcript.trim();const parsed=parseRouteSpeech(text);if(!parsed){setStatus('Nisam prepoznala relaciju. Pokušaj: “od Hotela Kolovare do Zračne luke Zadar”.');return}els.from.value=parsed.from;els.to.value=parsed.to;run()};
-    rec.onerror=()=>setStatus('Glasovno prepoznavanje nije uspjelo.');rec.start();
-  }
-  function listenDeal(){
-    const rec=new SR();rec.lang='hr-HR';rec.interimResults=false;rec.maxAlternatives=1;setStatus('Slušam nagodbu…');
-    rec.onresult=ev=>{const text=ev.results[0][0].transcript.toLowerCase().replace(',','.');const m=text.match(/(?:nagodba|dogovoreno|cijena)\D{0,10}(\d+(?:[.,]\d+)?)/i);if(!m){setStatus('Nisam prepoznala iznos. Reci: “nagodba 35 eura”.');return}els.dealPrice.value=m[1].replace(',','.');showDeal()};
-    rec.onerror=()=>setStatus('Glasovno prepoznavanje nije uspjelo.');rec.start();
-  }
+  function listenRoute(){const rec=new SR();rec.lang='hr-HR';rec.interimResults=false;rec.maxAlternatives=1;setStatus('Slušam… reci prirodno relaciju.');rec.onresult=ev=>{const text=ev.results[0][0].transcript.trim();const parsed=parseRouteSpeech(text);if(!parsed){setStatus('Nisam prepoznala relaciju. Pokušaj: “od Hotela Kolovare do Zračne luke Zadar”.');return}els.from.value=parsed.from;els.to.value=parsed.to;run()};rec.onerror=()=>setStatus('Glasovno prepoznavanje nije uspjelo.');rec.start()}
+  function listenDeal(){const rec=new SR();rec.lang='hr-HR';rec.interimResults=false;rec.maxAlternatives=1;setStatus('Slušam nagodbu…');rec.onresult=ev=>{const text=ev.results[0][0].transcript.toLowerCase().replace(',','.');const m=text.match(/(?:nagodba|dogovoreno|cijena)\D{0,10}(\d+(?:[.,]\d+)?)/i);if(!m){setStatus('Nisam prepoznala iznos. Reci: “nagodba 35 eura”.');return}els.dealPrice.value=m[1].replace(',','.');showDeal()};rec.onerror=()=>setStatus('Glasovno prepoznavanje nije uspjelo.');rec.start()}
   if(SR){els.voice.addEventListener('click',listenRoute);els.voiceDeal.addEventListener('click',listenDeal)}else{els.voice.disabled=true;els.voiceDeal.disabled=true;els.voice.textContent='Glas nije podržan';els.voiceDeal.textContent='Glas nije podržan'}
 
-  fillSettings();
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  fillSettings();firstLanguage();renderContacts();els.appLanguage.value=currentLanguage;els.languageSelect.value=currentLanguage;if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
 })();
 </script>
 </body>
