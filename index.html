@@ -51,7 +51,7 @@
   </div>
 </div>
 <main>
-  <div class="brand">VAŠ CHARLIE • LANA v0.5</div>
+  <div class="brand">VAŠ CHARLIE • LANA v0.6.1</div>
   <h1>Koliko košta od A do B?</h1>
   <p class="sub">Poznata Lana za cijenu A→B ostaje baza. Sada joj dodajemo GPS, aktivnu vožnju, glasovnog asistenta, upute, pozive, SMS, internet, glazbu i pripremu naplate — bez gubitka postojećeg cjenika i Nagodbe.</p>
 
@@ -247,7 +247,7 @@
 
   const LANG_VOICE={hr:'hr-HR',en:'en-US',de:'de-DE',it:'it-IT',fr:'fr-FR',es:'es-ES'};
   const UI={
-    hr:{listen:'Slušam.',quiet:'Tiha sam.',assistantOn:'Hands-free je uključen',assistantOff:'Hands-free nije uključen',activated:'Slušam. Reci što trebaš.',help:'Lana v0.5. Molim te Lana aktivira asistenta. Hvala ti Lana prekida razgovor. Za vožnju odaberi rutu ili trenutnu lokaciju, procijeni rutu i započni vožnju. Lana mjeri stvarne kilometre i minute. Nakon završetka odaberi način plaćanja, račun, R1 ili fiskalizaciju.',saved:'Spremljeno.'},
+    hr:{listen:'Slušam.',quiet:'Tiha sam.',assistantOn:'Hands-free je uključen',assistantOff:'Hands-free nije uključen',activated:'Slušam. Reci što trebaš.',help:'Lana v0.6.1. Molim te Lana aktivira asistenta. Hvala ti Lana prekida razgovor. Za vožnju odaberi rutu ili trenutnu lokaciju, procijeni rutu i započni vožnju. Lana mjeri stvarne kilometre i minute. Nakon završetka odaberi način plaćanja, račun, R1 ili fiskalizaciju.',saved:'Spremljeno.'},
     en:{listen:'I am listening.',quiet:'I am quiet.',assistantOn:'Hands-free is on',assistantOff:'Hands-free is off',activated:'I am listening. Tell me what you need.',help:'Lana v0.5. Say Please Lana to activate the assistant. Say Thank you Lana to stop. Choose a route or current location, estimate the route and start the ride. Lana measures actual kilometres and minutes. After the ride choose payment and receipt options.',saved:'Saved.'},
     de:{listen:'Ich höre zu.',quiet:'Ich bin still.',assistantOn:'Freisprechen ist aktiv',assistantOff:'Freisprechen ist aus',activated:'Ich höre zu. Was soll ich tun?',help:'Lana v0.5. Mit Bitte Lana aktivierst du den Assistenten. Mit Danke Lana beendest du den Dialog. Route wählen, Fahrt starten, Kilometer und Minuten werden gemessen.',saved:'Gespeichert.'},
     it:{listen:'Ti ascolto.',quiet:'Resto in silenzio.',assistantOn:'Modalità vivavoce attiva',assistantOff:'Modalità vivavoce disattiva',activated:'Ti ascolto. Dimmi cosa devo fare.',help:'Lana v0.5. Di Per favore Lana per attivare l’assistente e Grazie Lana per fermarlo. Seleziona il percorso, avvia la corsa e Lana misura chilometri e minuti.',saved:'Salvato.'},
@@ -256,6 +256,7 @@
   };
   let currentLanguage=localStorage.getItem('lanaLanguage')||'';
   let assistantEnabled=false,assistantAwake=false,assistantRec=null,assistantRestartTimer=null;
+  let lanaSpeaking=false,lastSpokenText='',ignoreSpeechUntil=0;
   let aiHistory=[];
   let aiBusy=false;
   let contacts=(()=>{try{return JSON.parse(localStorage.getItem('lanaContacts')||'{}')}catch{return {}}})();
@@ -266,7 +267,8 @@
   function saveContact(){const name=els.contactName.value.trim().toLowerCase(),phone=els.contactPhone.value.trim();if(!name||!phone){els.assistantStatus.textContent='Upiši ime i broj.';return}contacts[name]=phone;localStorage.setItem('lanaContacts',JSON.stringify(contacts));renderContacts();els.assistantStatus.textContent=ui().saved}
   function findContact(name){const key=name.trim().toLowerCase();if(contacts[key])return contacts[key];const hit=Object.keys(contacts).find(k=>key.includes(k)||k.includes(key));return hit?contacts[hit]:null}
   function assistantStatus(msg){els.assistantStatus.textContent=msg}
-  function silenceAssistant(){assistantAwake=false;speechSynthesis?.cancel();els.assistantPill.textContent='TIHA';els.assistantState.textContent=assistantEnabled?ui().assistantOn:ui().assistantOff;assistantStatus(ui().quiet)}
+  function normalizeSpeechText(t){return String(t||'').toLowerCase().replace(/[^a-z0-9čćžšđ\s]/gi,' ').replace(/\s+/g,' ').trim()}
+  function silenceAssistant(){assistantAwake=false;lanaSpeaking=false;lastSpokenText='';ignoreSpeechUntil=Date.now()+500;speechSynthesis?.cancel();els.assistantPill.textContent='TIHA';els.assistantState.textContent=assistantEnabled?ui().assistantOn:ui().assistantOff;assistantStatus(ui().quiet)}
   function wakeAssistant(){assistantAwake=true;els.assistantPill.textContent='SLUŠAM';els.assistantState.textContent=ui().activated;assistantStatus(ui().activated);speak(ui().listen)}
   function cleanAssistantPrefix(text){return text.replace(/^[\s,.]*(molim\s+te\s+lana|please\s+lana|bitte\s+lana|per\s+favore\s+lana|s['’]?il\s+te\s+pla[iî]t\s+lana|por\s+favor\s+lana)[\s,.]*/i,'').trim()}
   function hasWake(text){return /\b(molim\s+te\s+lana|please\s+lana|bitte\s+lana|per\s+favore\s+lana|s['’]?il\s+te\s+pla[iî]t\s+lana|por\s+favor\s+lana)\b/i.test(text)}
@@ -312,7 +314,23 @@
       speak(msg);
     }finally{aiBusy=false}
   }
-  function processAssistantTranscript(text){assistantStatus('Čula sam: '+text);if(hasSleep(text)){silenceAssistant();return}if(hasWake(text)){assistantAwake=true;const cmd=cleanAssistantPrefix(text);if(cmd)handleAssistantCommand(text);else wakeAssistant();return}if(assistantAwake)handleAssistantCommand(text)}
+  function processAssistantTranscript(text){
+    const now=Date.now();
+    const heard=normalizeSpeechText(text);
+    const own=normalizeSpeechText(lastSpokenText);
+    if(lanaSpeaking){
+      // Dok Lana govori, običan govor se ne tretira kao nova naredba.
+      // Jedina aktivna prekidna fraza ostaje "Hvala ti Lana".
+      // Ako se ta fraza nalazi u tekstu koji Lana upravo izgovara, tretiramo je kao vlastiti eho.
+      if(hasSleep(text) && !(own && own.includes(heard))){silenceAssistant();return}
+      return;
+    }
+    if(now<ignoreSpeechUntil)return;
+    assistantStatus('Čula sam: '+text);
+    if(hasSleep(text)){silenceAssistant();return}
+    if(hasWake(text)){assistantAwake=true;const cmd=cleanAssistantPrefix(text);if(cmd)handleAssistantCommand(text);else wakeAssistant();return}
+    if(assistantAwake)handleAssistantCommand(text)
+  }
   function startAssistantRecognition(){if(!SR){assistantStatus('Ovaj preglednik ne podržava prepoznavanje govora.');return}if(assistantRec)try{assistantRec.abort()}catch{};assistantRec=new SR();assistantRec.lang=LANG_VOICE[currentLanguage]||'hr-HR';assistantRec.continuous=true;assistantRec.interimResults=false;assistantRec.maxAlternatives=1;assistantRec.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)processAssistantTranscript(e.results[i][0].transcript.trim())};assistantRec.onerror=e=>{if(e.error!=='aborted'&&e.error!=='no-speech')assistantStatus('Mikrofon: '+e.error)};assistantRec.onend=()=>{assistantRec=null;if(assistantEnabled){clearTimeout(assistantRestartTimer);assistantRestartTimer=setTimeout(startAssistantRecognition,700)}};try{assistantRec.start();assistantEnabled=true;els.toggleAssistant.textContent='Isključi';els.assistantPill.textContent='TIHA';els.assistantState.textContent=ui().assistantOn;assistantStatus('Čekam “Molim te Lana…”.')}catch{assistantStatus('Mikrofon se nije mogao pokrenuti.')}
   }
   function stopAssistantRecognition(){assistantEnabled=false;assistantAwake=false;clearTimeout(assistantRestartTimer);if(assistantRec)try{assistantRec.abort()}catch{};assistantRec=null;els.toggleAssistant.textContent='Uključi';els.assistantPill.textContent='TIHA';els.assistantState.textContent=ui().assistantOff;assistantStatus(ui().quiet)}
@@ -340,7 +358,17 @@
   function setStatus(msg){els.status.textContent=msg}
   function setTripStatus(msg){els.tripStatus.textContent=msg}
   function setCheckoutStatus(msg){els.checkoutStatus.textContent=msg}
-  function speak(text){if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=LANG_VOICE[currentLanguage]||'en-US';speechSynthesis.speak(u)}}
+  function speak(text){
+    if(!('speechSynthesis' in window))return;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=LANG_VOICE[currentLanguage]||'en-US';
+    lanaSpeaking=true;
+    lastSpokenText=String(text||'');
+    u.onend=()=>{lanaSpeaking=false;lastSpokenText='';ignoreSpeechUntil=Date.now()+900};
+    u.onerror=()=>{lanaSpeaking=false;lastSpokenText='';ignoreSpeechUntil=Date.now()+900};
+    speechSynthesis.speak(u)
+  }
   function money(n,max=2){return Number(n).toLocaleString('hr-HR',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:max})}
   function fillSettings(){
     els.sThreshold.value=settings.threshold;els.sMinuteMode.value=settings.minuteMode;els.sSlowSpeed.value=settings.slowSpeed;
