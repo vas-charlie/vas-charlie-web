@@ -256,6 +256,8 @@
   };
   let currentLanguage=localStorage.getItem('lanaLanguage')||'';
   let assistantEnabled=false,assistantAwake=false,assistantRec=null,assistantRestartTimer=null;
+  let aiHistory=[];
+  let aiBusy=false;
   let contacts=(()=>{try{return JSON.parse(localStorage.getItem('lanaContacts')||'{}')}catch{return {}}})();
   function ui(){return UI[currentLanguage]||UI.en}
   function saveLanguage(lang){currentLanguage=LANG_VOICE[lang]?lang:'en';localStorage.setItem('lanaLanguage',currentLanguage);document.documentElement.lang=currentLanguage;els.appLanguage.value=currentLanguage;els.languageSelect.value=currentLanguage}
@@ -270,7 +272,7 @@
   function hasWake(text){return /\b(molim\s+te\s+lana|please\s+lana|bitte\s+lana|per\s+favore\s+lana|s['’]?il\s+te\s+pla[iî]t\s+lana|por\s+favor\s+lana)\b/i.test(text)}
   function hasSleep(text){return /\b(hvala\s+ti\s+lana|thank\s+you\s+lana|danke\s+lana|grazie\s+lana|merci\s+lana|gracias\s+lana)\b/i.test(text)}
   function openExternal(url){window.open(url,'_blank','noopener,noreferrer')}
-  function handleAssistantCommand(raw){
+  async function handleAssistantCommand(raw){
     const text=cleanAssistantPrefix(raw),lower=text.toLowerCase();if(!text){wakeAssistant();return}
     if(/pročitaj.*uput|read.*instruction|lies.*anleitung/i.test(lower)){els.helpDetails.open=true;speak(ui().help);assistantStatus('Čitam upute.');return}
     let m=text.match(/(?:pronađi(?:\s+mi)?(?:\s+na\s+internetu)?|pretraži(?:\s+internet)?|search(?:\s+the\s+web)?(?:\s+for)?)[\s:,-]+(.+)/i);if(m){openExternal('https://www.google.com/search?q='+encodeURIComponent(m[1]));assistantStatus('Otvaram internetsku pretragu: '+m[1]);return}
@@ -284,7 +286,31 @@
     if(/nagodba/i.test(lower)){const n=(lower.match(/(\d+(?:[.,]\d+)?)/)||[])[1];if(n){setMode('deal');els.dealPrice.value=n.replace(',','.');showDeal();return}}
     const parsed=parseRouteSpeech(text);if(parsed){setMode('tariff');els.from.value=parsed.from;els.to.value=parsed.to;run();return}
     if(/prevedi|translate/i.test(lower)){assistantStatus('Prijevod je pripremljen kao modul, ali za stvarni prijevod treba spojiti jezični servis. Neću izmišljati prijevod.');speak('Za stvarni prijevod trebam spojiti jezični servis.');return}
-    assistantStatus('Čula sam naredbu, ali je još nemam u ovoj verziji: '+text)
+    await askAI(text)
+  }
+  async function askAI(message){
+    if(aiBusy||!message)return;
+    aiBusy=true;
+    assistantStatus('Razmišljam…');
+    try{
+      const response=await fetch('/api/chat',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({message,history:aiHistory.slice(-10),language:currentLanguage})
+      });
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error(data.error||'AI nije dostupan.');
+      const reply=(data.reply||'').trim();
+      if(!reply)throw new Error('Nisam dobila odgovor.');
+      aiHistory.push({role:'user',content:message},{role:'assistant',content:reply});
+      if(aiHistory.length>20)aiHistory=aiHistory.slice(-20);
+      assistantStatus(reply);
+      speak(reply);
+    }catch(e){
+      const msg='Trenutno ne mogu do AI odgovora. Pokušaj ponovno za trenutak.';
+      assistantStatus(msg);
+      speak(msg);
+    }finally{aiBusy=false}
   }
   function processAssistantTranscript(text){assistantStatus('Čula sam: '+text);if(hasSleep(text)){silenceAssistant();return}if(hasWake(text)){assistantAwake=true;const cmd=cleanAssistantPrefix(text);if(cmd)handleAssistantCommand(text);else wakeAssistant();return}if(assistantAwake)handleAssistantCommand(text)}
   function startAssistantRecognition(){if(!SR){assistantStatus('Ovaj preglednik ne podržava prepoznavanje govora.');return}if(assistantRec)try{assistantRec.abort()}catch{};assistantRec=new SR();assistantRec.lang=LANG_VOICE[currentLanguage]||'hr-HR';assistantRec.continuous=true;assistantRec.interimResults=false;assistantRec.maxAlternatives=1;assistantRec.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)processAssistantTranscript(e.results[i][0].transcript.trim())};assistantRec.onerror=e=>{if(e.error!=='aborted'&&e.error!=='no-speech')assistantStatus('Mikrofon: '+e.error)};assistantRec.onend=()=>{assistantRec=null;if(assistantEnabled){clearTimeout(assistantRestartTimer);assistantRestartTimer=setTimeout(startAssistantRecognition,700)}};try{assistantRec.start();assistantEnabled=true;els.toggleAssistant.textContent='Isključi';els.assistantPill.textContent='TIHA';els.assistantState.textContent=ui().assistantOn;assistantStatus('Čekam “Molim te Lana…”.')}catch{assistantStatus('Mikrofon se nije mogao pokrenuti.')}
