@@ -1,6 +1,6 @@
 {
-  "version": "0.8.2",
-  "name": "Lana v0.8.2 PWA",
-  "releasedAt": "2026-08-29",
-  "notes": "Installable HTTPS/PWA package with official VAŠ CHARLIE C logo."
+  "version": "0.9.0",
+  "released": "2026-08-29",
+  "channel": "stable",
+  "note": "Novi Lana shell: Lana stalno na ekranu, paneli po potrebi, stalni izbornik, pozdravi putnika i donja upravljačka traka."
 }

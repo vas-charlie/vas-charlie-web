@@ -1,11 +1,11 @@
-const CACHE = 'lana-static-v0.8.2';
+const CACHE = 'lana-static-v0.9.0';
 const APP_SHELL = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
   '/icon-192.png',
   '/icon-512.png',
-  
+  '/lana-shell.webp',
   '/version.json'
 ];
 
@@ -30,27 +30,19 @@ self.addEventListener('fetch', event => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
-
   if (req.mode === 'navigate') {
-    event.respondWith(
-      fetch(req)
-        .then(res => {
-          const copy = res.clone();
-          caches.open(CACHE).then(cache => cache.put('/index.html', copy));
-          return res;
-        })
-        .catch(() => caches.match('/index.html'))
-    );
+    event.respondWith(fetch(req).then(res => {
+      const copy = res.clone();
+      caches.open(CACHE).then(cache => cache.put('/index.html', copy));
+      return res;
+    }).catch(() => caches.match('/index.html')));
     return;
   }
-
-  event.respondWith(
-    caches.match(req).then(cached => {
-      const network = fetch(req).then(res => {
-        if (res.ok) caches.open(CACHE).then(cache => cache.put(req, res.clone()));
-        return res;
-      }).catch(() => cached);
-      return cached || network;
-    })
-  );
+  event.respondWith(caches.match(req).then(cached => {
+    const network = fetch(req).then(res => {
+      if (res.ok) caches.open(CACHE).then(cache => cache.put(req, res.clone()));
+      return res;
+    }).catch(() => cached);
+    return cached || network;
+  }));
 });

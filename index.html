@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#111827" />
+  <meta name="theme-color" content="#eaf2ff" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Lana" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="icon" href="/icon-192.png" />
@@ -62,9 +62,121 @@
 
     .dispatch-panel{max-height:min(94vh,980px);overflow:auto}.dispatch-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}.dispatch-card{background:#0f172a;border:1px solid #334155;border-radius:16px;padding:12px;margin-top:10px}.dispatch-card.active{border-color:#2563eb}.dispatch-card.accepted{border-color:#16a34a}.dispatch-card.unassigned{border-color:#d97706}.dispatch-route{font-weight:800;line-height:1.35}.dispatch-meta{font-size:.8rem;color:#94a3b8;line-height:1.5;margin-top:5px}.dispatch-countdown{font-size:1.35rem;font-weight:900;text-align:center;padding:8px 10px;border-radius:12px;background:#111827;border:1px solid #334155;margin:9px 0}.dispatch-countdown.urgent{border-color:#d97706}.dispatch-attempts{display:grid;gap:6px;margin-top:10px}.dispatch-attempt{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:7px 9px;background:#111827;border:1px solid #334155;border-radius:10px;font-size:.76rem}.dispatch-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}.dispatch-actions button{min-height:44px;padding:7px;font-size:.78rem}.dispatch-score{display:inline-block;border:1px solid #2563eb;color:#bfdbfe;border-radius:999px;padding:2px 7px;font-size:.7rem}.dispatch-signal{display:inline-block;border:1px solid #d97706;color:#fde68a;border-radius:999px;padding:2px 7px;font-size:.7rem}.dispatch-ok{display:inline-block;border:1px solid #16a34a;color:#bbf7d0;border-radius:999px;padding:2px 7px;font-size:.7rem}.dispatch-filter{display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:end}.dispatch-editor{background:#0f172a;border:1px solid #334155;border-radius:16px;padding:12px;margin:12px 0}.dispatch-editor[hidden]{display:none}@media(max-width:650px){.dispatch-overview{grid-template-columns:1fr 1fr}.dispatch-actions{grid-template-columns:1fr 1fr}.dispatch-filter{grid-template-columns:1fr}.dispatch-filter button{width:100%}}
 
+
+
+/* ===== LANA SHELL v0.9.0 =====
+   Lana je stalna prisutnost. Postojeći v0.8.2 motor ostaje ispod sučelja. */
+:root{color-scheme:light;--lana-blue:#2563eb;--lana-deep:#12376a;--lana-ink:#102a52;--lana-soft:#eaf2ff;--lana-pale:#f7fbff;--lana-line:#c9d9ee;--lana-white:rgba(255,255,255,.94);--lana-shadow:0 18px 54px rgba(30,64,175,.16)}
+html,body{width:100%;height:100%;overflow:hidden;background:#eef6ff;color:var(--lana-ink)}
+body{overscroll-behavior:none}
+body>main{display:none!important}
+.lana-shell{position:fixed;inset:0;z-index:1;overflow:hidden;background:linear-gradient(125deg,#fbfdff 0%,#eef6ff 54%,#dcecff 100%);color:var(--lana-ink)}
+.lana-shell::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 28%,rgba(255,255,255,.72),transparent 36%),linear-gradient(to top,rgba(228,240,255,.72),transparent 30%);pointer-events:none}
+.lana-topbar{position:absolute;z-index:22;top:0;left:0;right:0;min-height:72px;padding:calc(10px + env(safe-area-inset-top)) 18px 8px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(to bottom,rgba(255,255,255,.94),rgba(255,255,255,.55),transparent);backdrop-filter:blur(7px)}
+.lana-brandline{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.055em;color:#143568;white-space:nowrap}.lana-brandline img{width:38px;height:38px;border-radius:12px}.lana-brandline .ver{font-size:.78em;color:#3972c9;font-weight:850}
+.lana-live-status{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:750;color:#244a7d;background:rgba(255,255,255,.72);border:1px solid rgba(173,198,229,.65);border-radius:999px;padding:7px 11px;box-shadow:0 6px 20px rgba(37,99,235,.08)}
+.lana-live-dot{width:9px;height:9px;border-radius:50%;background:#22a15a;box-shadow:0 0 0 4px rgba(34,161,90,.10)}
+.lana-live-status.listening .lana-live-dot{background:#2563eb;box-shadow:0 0 0 4px rgba(37,99,235,.14)}
+.lana-stage{position:absolute;z-index:2;inset:0 0 192px 0;pointer-events:none}
+.lana-portrait{position:absolute;z-index:2;left:-3px;top:68px;height:min(calc(100vh - 260px),1135px);min-height:590px;width:auto;max-width:none;object-fit:contain;object-position:left top;filter:drop-shadow(0 18px 28px rgba(30,64,175,.10));user-select:none;-webkit-user-drag:none}
+.lana-menu-hotspot{position:absolute;z-index:30;top:calc(93px + env(safe-area-inset-top));left:18px;width:104px;height:104px;border-radius:50%;border:0;background:transparent;color:transparent;box-shadow:none;padding:0;pointer-events:auto;touch-action:manipulation}
+.lana-menu-hotspot:focus-visible{outline:4px solid rgba(37,99,235,.35);outline-offset:4px}
+.lana-speech{position:absolute;z-index:25;top:148px;right:18px;width:min(230px,35vw);min-height:108px;padding:17px 17px 19px;border:1px solid #d5e1f2;border-radius:24px;background:rgba(255,255,255,.97);box-shadow:var(--lana-shadow);font-size:clamp(.93rem,2.8vw,1.1rem);font-weight:760;line-height:1.3;color:#153463;pointer-events:auto;transition:opacity .18s ease,transform .18s ease}
+.lana-speech::after{content:"";position:absolute;left:31px;bottom:-19px;border:10px solid transparent;border-top-color:#fff;transform:rotate(14deg)}
+.lana-speech[hidden]{display:none}.lana-speech.show{display:block;animation:lanaBubbleIn .18s ease-out}
+@keyframes lanaBubbleIn{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+.lana-menu-drawer{position:absolute;z-index:80;top:calc(82px + env(safe-area-inset-top));left:16px;bottom:205px;width:min(360px,calc(100vw - 32px));overflow:auto;padding:16px;border:1px solid rgba(169,195,228,.9);border-radius:26px;background:rgba(248,252,255,.97);backdrop-filter:blur(18px);box-shadow:0 26px 70px rgba(19,54,105,.24);pointer-events:auto}
+.lana-menu-drawer[hidden]{display:none}.lana-menu-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.lana-menu-head strong{font-size:1.1rem}.lana-x{width:44px;min-width:44px;height:44px;border-radius:50%;padding:0;background:#e7f0ff;color:#163b72;border:1px solid #c6d8ef}.lana-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.lana-menu-grid button{min-height:58px;background:#fff;color:#153568;border:1px solid #cfdded;box-shadow:0 7px 18px rgba(24,69,125,.07);font-size:.87rem;padding:8px}.lana-menu-grid button.primary{background:#2f6deb;color:white;border-color:#2f6deb}.lana-menu-note{font-size:.75rem;line-height:1.4;color:#7085a3;margin-top:12px}
+.lana-greetings{position:absolute;z-index:70;left:16px;right:16px;bottom:103px;height:88px;border:1px solid rgba(174,198,226,.82);border-radius:24px;background:rgba(255,255,255,.91);backdrop-filter:blur(16px);box-shadow:0 10px 28px rgba(23,64,118,.13);display:flex;align-items:center;gap:8px;padding:9px 10px;overflow-x:auto;scrollbar-width:none;pointer-events:auto}.lana-greetings::-webkit-scrollbar{display:none}.lana-greetings-title{flex:0 0 auto;font-size:.71rem;font-weight:900;color:#3b5f8f;padding:0 7px}.lana-greet-btn{flex:0 0 112px;width:112px;min-height:66px;border-radius:18px;border:1px solid #d1dfef;background:#fff;color:#173766;padding:7px;font-size:.78rem;line-height:1.15;box-shadow:0 5px 14px rgba(29,74,130,.07)}.lana-greet-btn strong{display:block;font-size:1.2rem;margin-bottom:2px}.lana-greet-btn.primary{background:#2f6deb;color:white;border-color:#2f6deb}
+.lana-commandbar{position:absolute;z-index:75;left:0;right:0;bottom:0;min-height:94px;padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(22,52,101,.96),rgba(11,34,73,.99));display:grid;grid-template-columns:1fr 1fr 1.18fr 1fr 1fr;gap:7px;pointer-events:auto;box-shadow:0 -8px 28px rgba(10,42,87,.18)}
+.lana-commandbar button{min-width:0;min-height:72px;border:0;border-radius:17px;background:rgba(255,255,255,.055);color:#f7fbff;padding:6px 4px;font-size:.67rem;line-height:1.15}.lana-commandbar button strong{display:block;font-size:1.15rem;margin-bottom:3px}.lana-commandbar button .small{display:block;font-size:.62rem;color:#b7c8e3;margin-top:2px}.lana-commandbar .voice-core{width:74px;min-width:74px;height:74px;min-height:74px;justify-self:center;border-radius:50%;background:radial-gradient(circle at 35% 30%,#6ba1ff,#2058c8 58%,#102b62);border:2px solid #88b2ff;box-shadow:0 0 0 5px rgba(40,103,238,.16),0 10px 28px rgba(0,0,0,.28);font-size:1.65rem}.lana-commandbar button.active{background:rgba(45,181,108,.16);color:#d9ffe9}.lana-commandbar button.active .small{color:#83edb0}
+.lana-work-panel{position:absolute;z-index:78;right:12px;bottom:205px;width:min(520px,calc(100vw - 24px));max-height:60vh;overflow:auto;border:1px solid #c7d8eb;border-radius:26px;background:rgba(250,253,255,.97);backdrop-filter:blur(18px);box-shadow:0 24px 68px rgba(16,52,99,.25);padding:16px;pointer-events:auto}.lana-work-panel[hidden]{display:none}.lana-work-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.lana-work-head h2{margin:0;font-size:1.08rem;color:#15386d}.lana-work-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}.lana-work-tabs button{background:#eaf2ff;color:#1d4f94;border:1px solid #bed3ee}.lana-work-tabs button.active{background:#2f6deb;color:#fff;border-color:#2f6deb}.lana-work-panel label{color:#5f7390}.lana-work-panel input,.lana-work-panel select{background:#fff;color:#102e5b;border:1px solid #c5d6e9}.lana-work-result{border:1px solid #bfd5ef;background:#edf5ff;border-radius:18px;padding:11px 12px;margin-top:8px}.lana-work-result .big{font-size:1.55rem;font-weight:900;color:#174da0}.lana-work-result .route{font-size:.78rem;color:#61738d;margin-top:4px}.lana-work-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.lana-work-actions button{background:#2f6deb}.lana-work-actions button.secondary{background:#e8f1ff;color:#17467e;border-color:#bfd3ed}.lana-work-status{font-size:.8rem;color:#4d6b92;min-height:1.4em;margin:6px 0}
+/* Existing v0.8.2 panels now behave as cards over Lana, not full-screen walls. */
+.tool-overlay{z-index:58!important;background:rgba(227,239,255,.17)!important;backdrop-filter:blur(1.5px)!important;align-items:flex-end!important;justify-content:flex-end!important;padding:84px 12px 205px!important;pointer-events:none!important}.tool-overlay[hidden]{display:none!important}.tool-panel{pointer-events:auto!important;width:min(560px,92vw)!important;max-height:60vh!important;overflow:auto!important;background:rgba(250,253,255,.97)!important;color:#14345f!important;border:1px solid #c8d9ec!important;box-shadow:0 24px 68px rgba(16,52,99,.25)!important;border-radius:26px!important}.tool-panel h2,.tool-panel h3,.tool-panel strong{color:inherit}.tool-panel label{color:#637791}.tool-panel input,.tool-panel select,.tool-panel textarea{background:#fff!important;color:#12345f!important;border-color:#c5d6e9!important}.tool-panel button{background:#2f6deb;color:#fff;border-color:#2f6deb}.tool-panel button.secondary,.tool-panel button.ghost{background:#e9f2ff!important;color:#173f75!important;border-color:#bfd3eb!important}.tool-panel .note,.tool-panel .muted,.tool-panel .tool-note,.tool-panel .cc-note,.tool-panel .client-meta,.tool-panel .route-note,.tool-panel .stats-warning,.tool-panel .passenger-audio-note{color:#657a98!important}.tool-panel .metric,.tool-panel .mapbox,.tool-panel .estimate-metric,.tool-panel .estimate-route,.tool-panel .profit-settings,.tool-panel .profit-metric,.tool-panel .profit-detail,.tool-panel .expense-recent,.tool-panel .income-recent,.tool-panel .client-card,.tool-panel .client-editor,.tool-panel .client-overview-box,.tool-panel .stats-main-card,.tool-panel .stats-box,.tool-panel .stats-goal,.tool-panel .stats-settings,.tool-panel .cc-section,.tool-panel .passenger-client-box,.tool-panel .passenger-editor,.tool-panel .shift-log,.tool-panel .shift-metric,.tool-panel .dispatch-card,.tool-panel .dispatch-attempt,.tool-panel .partner-stat,.tool-panel .partner-finance{background:#f7fbff!important;color:#14345f!important;border-color:#d1dfef!important}.tool-panel .pill,.tool-panel .cc-badge,.tool-panel .client-badge,.tool-panel .partner-badge{background:#eaf2ff;color:#174578;border-color:#bdd1ea}.tool-panel .client-card.blacklisted,.tool-panel .debt-card.overdue{background:#fff1f2!important;border-color:#f1aeb5!important}.tool-panel .debt-card.due-soon,.tool-panel .shift-paused{background:#fff8e8!important;border-color:#f0cc80!important}.tool-panel .shift-active,.tool-panel .shift-summary,.tool-panel .profit-good,.tool-panel .stats-main-card.clean.good,.tool-panel .stats-goal.good{background:#edfdf3!important;border-color:#9edbb7!important;color:#14532d!important}.tool-panel .profit-bad,.tool-panel .stats-main-card.clean.bad,.tool-panel .stats-goal.bad{background:#fff1f2!important;border-color:#f0a2ac!important;color:#8a1c2a!important}.tool-panel .profit-borderline{background:#fff8e8!important;border-color:#eac56f!important;color:#72510b!important}.trip-panel,.checkout-panel,.shift-panel,.profit-panel,.expense-panel,.income-panel,.client-panel,.stats-panel,.control-panel,.passenger-panel,.debt-panel,.partner-panel,.dispatch-panel{max-height:60vh!important}.trip-panel .tripbar,.checkout-panel .tripbar{position:static!important;background:transparent!important}.app-lock{z-index:10000!important}.overlay{z-index:1000}.overlay:not([hidden]){background:rgba(5,22,48,.94)!important}.overlay .modal{background:#f8fbff!important;color:#14345f!important;border-color:#c7d7ea!important}.overlay .modal input,.overlay .modal select{background:#fff!important;color:#14345f!important;border-color:#c7d7ea!important}
+#startupOverlay{background:transparent!important;backdrop-filter:none!important}#startupOverlay:not([hidden]){display:none!important}
+/* Moved legacy Help/Contacts/Tariff cards live inside light shell panels. */
+.shell-moved-card{background:transparent!important;border:0!important;padding:0!important;margin:0!important}.shell-moved-card details>summary{color:#153a70;margin-bottom:10px}.shell-moved-card .card{background:transparent!important}
+@media(max-width:760px){.lana-topbar{min-height:64px;padding-left:12px;padding-right:12px}.lana-brandline{font-size:.86rem;letter-spacing:.035em}.lana-brandline img{width:32px;height:32px}.lana-live-status{font-size:.7rem;padding:6px 8px}.lana-stage{bottom:190px}.lana-portrait{top:58px;height:min(calc(100vh - 242px),1135px);min-height:570px}.lana-menu-hotspot{top:calc(79px + env(safe-area-inset-top));left:9px;width:96px;height:96px}.lana-speech{top:134px;right:10px;width:min(222px,36vw);min-height:96px;padding:13px 13px 16px;border-radius:20px}.lana-menu-drawer{top:calc(70px + env(safe-area-inset-top));left:10px;bottom:199px;width:min(350px,calc(100vw - 20px));padding:13px}.lana-greetings{left:8px;right:8px;bottom:98px;height:88px;border-radius:20px}.lana-greet-btn{flex-basis:105px;width:105px}.lana-commandbar{min-height:92px;padding-left:6px;padding-right:6px;gap:4px}.lana-commandbar button{min-height:70px;font-size:.62rem}.lana-commandbar .voice-core{width:68px;min-width:68px;height:68px;min-height:68px}.lana-work-panel{right:7px;left:7px;bottom:195px;width:auto;max-height:57vh;padding:13px;border-radius:22px}.tool-overlay{padding:72px 7px 195px!important}.tool-panel{width:100%!important;max-height:57vh!important;border-radius:22px!important}.trip-panel,.checkout-panel,.shift-panel,.profit-panel,.expense-panel,.income-panel,.client-panel,.stats-panel,.control-panel,.passenger-panel,.debt-panel,.partner-panel,.dispatch-panel{max-height:57vh!important}}
+@media(max-width:420px){.lana-brandline{font-size:.62rem;gap:5px}.lana-brandline img{width:28px;height:28px}.lana-live-status{font-size:.58rem;padding:5px 6px;gap:5px}.lana-speech{width:42vw;right:7px;top:125px;font-size:.85rem}.lana-menu-drawer{width:min(238px,66vw);padding:10px;bottom:199px}.lana-menu-head strong{font-size:.86rem}.lana-menu-grid{grid-template-columns:1fr}.lana-menu-grid button{min-height:44px;font-size:.72rem;padding:6px}.lana-menu-note{font-size:.65rem}.lana-greetings-title{display:none}.lana-greet-btn{flex-basis:96px;width:96px}.lana-commandbar button .small{display:none}.lana-commandbar button{font-size:.58rem}.lana-portrait{left:-18px}.lana-work-panel{max-height:40vh!important}.tool-panel{max-height:40vh!important}.trip-panel,.checkout-panel,.shift-panel,.profit-panel,.expense-panel,.income-panel,.client-panel,.stats-panel,.control-panel,.passenger-panel,.debt-panel,.partner-panel,.dispatch-panel{max-height:40vh!important}}
 </style>
 </head>
 <body>
+<div class="lana-shell" id="lanaShell">
+  <header class="lana-topbar">
+    <div class="lana-brandline"><img src="/icon-192.png" alt="VAŠ CHARLIE" /><span class="brand-long">VAŠ CHARLIE • </span><span>LANA <span class="ver">v0.9.0</span></span></div>
+    <div class="lana-live-status" id="shellLiveStatus"><span class="lana-live-dot"></span><span id="shellReadyText">Lana je spremna</span><span id="shellClock"></span></div>
+  </header>
+  <div class="lana-stage" aria-label="Lana, VAŠ CHARLIE asistentica">
+    <img class="lana-portrait" src="/lana-shell.webp" alt="Lana s naočalama, olovkom i VAŠ CHARLIE brošem" />
+    <button class="lana-menu-hotspot" id="shellMenuToggle" type="button" aria-label="Otvori izbornik">Izbornik</button>
+    <div class="lana-speech" id="shellSpeech" aria-live="polite" hidden>Tu sam za tebe, Charlie. 💙</div>
+  </div>
+
+  <aside class="lana-menu-drawer" id="shellMenu" hidden aria-label="Izbornik Lane">
+    <div class="lana-menu-head"><strong>VAŠ CHARLIE alati</strong><button class="lana-x" id="shellMenuClose" type="button" aria-label="Zatvori izbornik">✕</button></div>
+    <div class="lana-menu-grid">
+      <button class="primary" data-shell-action="route" type="button">📍 Procjena A → B</button>
+      <button data-shell-action="deal" type="button">🤝 Nagodba</button>
+      <button data-shell-click="openShiftPanel" type="button">🕐 Smjena</button>
+      <button data-shell-click="openProfitPanel" type="button">🧮 Isplativost</button>
+      <button data-shell-click="openExpensePanel" type="button">💸 Brzi trošak</button>
+      <button data-shell-click="openIncomePanel" type="button">💶 Prihodi</button>
+      <button data-shell-click="openClientPanel" type="button">👥 Klijenti / CRM</button>
+      <button data-shell-click="openReservationPanel" type="button">📅 Rezervacije</button>
+      <button data-shell-click="openStatsPanel" type="button">📊 Statistika</button>
+      <button data-shell-click="openPassengerPanel" type="button">🧑‍💼 Putnik</button>
+      <button data-shell-click="openOwnDebtsPanel" type="button">💳 Moja dugovanja</button>
+      <button data-shell-click="openPartnersPanel" type="button">🤝 Kooperanti</button>
+      <button data-shell-click="openDispatchPanel" type="button">📡 Dispatch</button>
+      <button data-shell-click="openControlPanel" type="button">⚙️ Kontrolni centar</button>
+      <button data-shell-action="contacts" type="button">🌍 Jezik i kontakti</button>
+      <button data-shell-action="tariff" type="button">🚕 Postavke cjenika</button>
+      <button data-shell-action="help" type="button">❓ Upute</button>
+    </div>
+    <div class="lana-menu-note">Lana ostaje na ekranu. Alati se otvaraju kao radni paneli i zatvaraju se bez prekidanja smjene.</div>
+  </aside>
+
+  <section class="lana-work-panel" id="shellRoutePanel" hidden aria-label="Procjena rute i nagodba">
+    <div class="lana-work-head"><h2 id="shellRouteTitle">📍 Procjena A → B</h2><button class="lana-x" id="shellRouteClose" type="button" aria-label="Zatvori">✕</button></div>
+    <div class="lana-work-tabs"><button class="active" id="shellRouteTab" type="button">Taksimetarski cjenik</button><button id="shellDealTab" type="button">Nagodba</button></div>
+    <div id="shellRouteMode">
+      <label for="shellFrom">Polazište</label><input id="shellFrom" autocomplete="street-address" placeholder="Moja trenutna lokacija" />
+      <button id="shellUseLocation" class="secondary" type="button" style="margin:-4px 0 10px">📍 Koristi moju trenutnu lokaciju</button>
+      <label for="shellTo">Odredište</label><input id="shellTo" autocomplete="street-address" placeholder="npr. Zračna luka Zadar" />
+      <label for="shellPassengers">Broj putnika</label><select id="shellPassengers"><option value="4">1–4 putnika</option><option value="6">5–6 putnika</option></select>
+      <button id="shellCalculate" type="button">Procijeni rutu i cijenu</button>
+    </div>
+    <div id="shellDealMode" hidden>
+      <label for="shellDealPrice">Dogovorena cijena (€)</label><input id="shellDealPrice" type="number" inputmode="decimal" min="0" step="0.5" placeholder="npr. 35" />
+      <button id="shellConfirmDeal" type="button">Potvrdi nagodbu</button>
+    </div>
+    <div class="lana-work-status" id="shellRouteStatus"></div>
+    <div class="lana-work-result" id="shellRouteResult" hidden><div class="big" id="shellRoutePrice">—</div><div class="route" id="shellRouteInfo"></div><div class="lana-work-actions"><button id="shellStartTrip" type="button">▶ Započni vožnju</button><button id="shellNavigate" class="secondary" type="button">🧭 Vodi me</button></div></div>
+  </section>
+
+  <section class="lana-work-panel" id="shellLegacyPanel" hidden aria-label="Dodatne postavke">
+    <div class="lana-work-head"><h2 id="shellLegacyTitle">Postavke</h2><button class="lana-x" id="shellLegacyClose" type="button" aria-label="Zatvori">✕</button></div>
+    <div id="shellLegacyBody"></div>
+  </section>
+
+  <section class="lana-greetings" aria-label="Brzi pozdravi putnika">
+    <div class="lana-greetings-title">👥 PUTNIK</div>
+    <button class="lana-greet-btn primary" data-greet="standard" type="button"><strong>👋</strong>Pozdravi</button>
+    <button class="lana-greet-btn" data-greet="warm" type="button"><strong>🙂</strong>Topli pozdrav</button>
+    <button class="lana-greet-btn" data-greet="returning" type="button"><strong>🔁</strong>Stalni klijent</button>
+    <button class="lana-greet-btn" data-greet="exit" type="button"><strong>👋</strong>Hvala / doviđenja</button>
+    <button class="lana-greet-btn" data-shell-click="openPassengerPanel" type="button"><strong>🧑‍💼</strong>Više poruka</button>
+  </section>
+
+  <nav class="lana-commandbar" aria-label="Stalne kontrole Lane">
+    <button id="shellMic" type="button"><strong>🎙️</strong>Mikrofon<span class="small" id="shellMicSmall">isključen</span></button>
+    <button id="shellShift" type="button"><strong>🕐</strong>Smjena<span class="small" id="shellShiftSmall">nema smjene</span></button>
+    <button class="voice-core" id="shellVoiceCore" type="button" aria-label="Lana glasovni centar">≋</button>
+    <button id="shellTaxi" type="button"><strong>🚕</strong>Taksimetar<span class="small">A → B</span></button>
+    <button id="shellPassenger" type="button"><strong>🧑‍💼</strong>Putnik<span class="small" id="shellPassengerSmall">isključen</span></button>
+  </nav>
+</div>
+
 <div class="overlay" id="languageOverlay" hidden>
   <div class="modal">
     <div class="brand">LANA • FIRST START</div>
@@ -771,12 +883,12 @@
     <input id="appPinInput" type="password" inputmode="numeric" autocomplete="current-password" maxlength="8" placeholder="PIN" aria-label="PIN za Lanu" />
     <button id="unlockApp" type="button">Otključaj</button>
     <div class="lock-status" id="appLockStatus" aria-live="polite"></div>
-    <div class="lock-brand">VAŠ CHARLIE • LANA v0.8.2</div>
+    <div class="lock-brand">VAŠ CHARLIE • LANA v0.9.0</div>
   </section>
 </div>
 
 <main>
-  <div class="brand">VAŠ CHARLIE • LANA v0.8.2</div>
+  <div class="brand">VAŠ CHARLIE • LANA v0.9.0</div>
   <h1>Koliko košta od A do B?</h1>
   <p class="sub">Poznata Lana za cijenu A→B ostaje baza. Sada joj dodajemo GPS, aktivnu vožnju, glasovnog asistenta, upute, pozive, SMS, internet, glazbu i pripremu naplate — bez gubitka postojećeg cjenika i Nagodbe.</p>
 
@@ -937,7 +1049,7 @@
 
   const LANG_VOICE={hr:'hr-HR',en:'en-US',de:'de-DE',it:'it-IT',fr:'fr-FR',es:'es-ES'};
   const UI={
-    hr:{listen:'Slušam.',quiet:'Tiha sam.',assistantOn:'Hands-free je uključen',assistantOff:'Hands-free nije uključen',activated:'Slušam. Reci što trebaš.',help:'Lana v0.8.2. Molim te Lana aktivira asistenta. Hvala ti Lana prekida razgovor. Za vožnju odaberi rutu ili trenutnu lokaciju, procijeni rutu i započni vožnju. Lana mjeri stvarne kilometre i minute. Nakon završetka odaberi način plaćanja, račun, R1 ili fiskalizaciju. Brzi trošak možeš reći prirodno, primjerice: dodaj trošak 6,80 eura, pizza u smjeni, ili privatni fiksni trošak 23,30 eura životno osiguranje. Klijente otvaraš naredbom otvori klijente. CRM vodi TOP listu, crnu listu, napojnice po klijentu, dugovanja, poklone i gratis vožnje. Uber i Bolt prihodi vode se odvojeno: vožnje, bonusi, otkazne naknade i napojnice preko aplikacije. Napojnice na ruke vode se posebno. Kod naplate možeš označiti Klijent duguje i upisati djelomično plaćeni iznos. Statistiku otvaraš naredbom otvori statistiku, a Lana razdvaja bruto vrijednost rada, naplaćeno, troškove i čistu evidentiranu zaradu. Samoažuriranje provjerava novu online verziju i primjenjuje je tek kada nema aktivne vožnje ili otvorene naplate. Putnik panel otvaraš ručno i iz njega biraš kada Lana govori putniku, kojim jezikom i koju poruku. Javni TOP pristanak vodi se odvojeno od CRM pristanka. Moja dugovanja vode privatne i poslovne obveze, rokove i povijest uplata. Suradnici / kooperanti vode poslovni imenik, pouzdanost, ugovor, dokumentaciju, naše vožnje, bruto naplaćeno i proviziju koju nam duguju. Dispatch otvaraš naredbom otvori ponude. Ponuda ima ograničeno vrijeme za prihvat ili odbijanje, a istek, tehnički problem i potvrđeno namjerno propuštanje vode se odvojeno.',saved:'Spremljeno.'},
+    hr:{listen:'Slušam.',quiet:'Tiha sam.',assistantOn:'Hands-free je uključen',assistantOff:'Hands-free nije uključen',activated:'Slušam. Reci što trebaš.',help:'Lana v0.9.0. Molim te Lana aktivira asistenta. Hvala ti Lana prekida razgovor. Za vožnju odaberi rutu ili trenutnu lokaciju, procijeni rutu i započni vožnju. Lana mjeri stvarne kilometre i minute. Nakon završetka odaberi način plaćanja, račun, R1 ili fiskalizaciju. Brzi trošak možeš reći prirodno, primjerice: dodaj trošak 6,80 eura, pizza u smjeni, ili privatni fiksni trošak 23,30 eura životno osiguranje. Klijente otvaraš naredbom otvori klijente. CRM vodi TOP listu, crnu listu, napojnice po klijentu, dugovanja, poklone i gratis vožnje. Uber i Bolt prihodi vode se odvojeno: vožnje, bonusi, otkazne naknade i napojnice preko aplikacije. Napojnice na ruke vode se posebno. Kod naplate možeš označiti Klijent duguje i upisati djelomično plaćeni iznos. Statistiku otvaraš naredbom otvori statistiku, a Lana razdvaja bruto vrijednost rada, naplaćeno, troškove i čistu evidentiranu zaradu. Samoažuriranje provjerava novu online verziju i primjenjuje je tek kada nema aktivne vožnje ili otvorene naplate. Putnik panel otvaraš ručno i iz njega biraš kada Lana govori putniku, kojim jezikom i koju poruku. Javni TOP pristanak vodi se odvojeno od CRM pristanka. Moja dugovanja vode privatne i poslovne obveze, rokove i povijest uplata. Suradnici / kooperanti vode poslovni imenik, pouzdanost, ugovor, dokumentaciju, naše vožnje, bruto naplaćeno i proviziju koju nam duguju. Dispatch otvaraš naredbom otvori ponude. Ponuda ima ograničeno vrijeme za prihvat ili odbijanje, a istek, tehnički problem i potvrđeno namjerno propuštanje vode se odvojeno.',saved:'Spremljeno.'},
     en:{listen:'I am listening.',quiet:'I am quiet.',assistantOn:'Hands-free is on',assistantOff:'Hands-free is off',activated:'I am listening. Tell me what you need.',help:'Lana v0.5. Say Please Lana to activate the assistant. Say Thank you Lana to stop. Choose a route or current location, estimate the route and start the ride. Lana measures actual kilometres and minutes. After the ride choose payment and receipt options.',saved:'Saved.'},
     de:{listen:'Ich höre zu.',quiet:'Ich bin still.',assistantOn:'Freisprechen ist aktiv',assistantOff:'Freisprechen ist aus',activated:'Ich höre zu. Was soll ich tun?',help:'Lana v0.5. Mit Bitte Lana aktivierst du den Assistenten. Mit Danke Lana beendest du den Dialog. Route wählen, Fahrt starten, Kilometer und Minuten werden gemessen.',saved:'Gespeichert.'},
     it:{listen:'Ti ascolto.',quiet:'Resto in silenzio.',assistantOn:'Modalità vivavoce attiva',assistantOff:'Modalità vivavoce disattiva',activated:'Ti ascolto. Dimmi cosa devo fare.',help:'Lana v0.5. Di Per favore Lana per attivare l’assistente e Grazie Lana per fermarlo. Seleziona il percorso, avvia la corsa e Lana misura chilometri e minuti.',saved:'Salvato.'},
@@ -1248,7 +1360,7 @@
   function wakeAssistant(){assistantAwake=true;els.assistantPill.textContent='SLUŠAM';els.assistantState.textContent=ui().activated;assistantStatus(ui().activated);speak(ui().listen)}
   const APP_PREFS_KEY='lanaAppPrefsV01';
   const PIN_SECURITY_KEY='lanaPinSecurityV01';
-  const APP_VERSION='0.8.2';
+  const APP_VERSION='0.9.0';
   const DEFAULT_APP_PREFS={startupReminder:true,defaultReservationReminder:30,websiteUrl:'',ordersApiUrl:'',autoUpdate:true};
   const DEFAULT_PIN_SECURITY={enabled:false,salt:'',hash:'',autoLockMinutes:5};
   function loadAppPrefs(){try{return{...DEFAULT_APP_PREFS,...JSON.parse(localStorage.getItem(APP_PREFS_KEY)||'{}')}}catch{return{...DEFAULT_APP_PREFS}}}
@@ -1935,7 +2047,7 @@ Klijent: ${checkoutClientObj.name}`:'';const r1=els.wantR1.checked?`
 R1: DA
 Kupac: ${els.r1Name.value||'—'}
 OIB: ${els.r1Oib.value||'—'}
-Adresa: ${els.r1Address.value||'—'}`:'';const fiscal=els.wantFiscal.checked?'DA — čeka spajanje fiskalnog API-ja':'NE',n=checkoutNumbers();const txt=`VAŠ CHARLIE • LANA v0.8.2
+Adresa: ${els.r1Address.value||'—'}`:'';const fiscal=els.wantFiscal.checked?'DA — čeka spajanje fiskalnog API-ja':'NE',n=checkoutNumbers();const txt=`VAŠ CHARLIE • LANA v0.9.0
 
 Vožnja
 Km: ${trip.final.km.toFixed(2)}
@@ -1996,6 +2108,71 @@ Fiskalizacija: ${fiscal}${r1}`;els.receiptPreview.textContent=txt;els.receiptPre
   if(SR){els.voice.addEventListener('click',listenRoute);els.voiceDeal.addEventListener('click',listenDeal)}else{els.voice.disabled=true;els.voiceDeal.disabled=true;els.voice.textContent='Glas nije podržan';els.voiceDeal.textContent='Glas nije podržan'}
 
   fillSettings();fillProfitSettings();renderExpenseRecent();renderIncomeClientOptions();renderIncomeRecent();firstLanguage();renderContacts();renderCheckoutClientOptions();renderClients();renderReservationClientOptions();checkReservationReminders();els.appLanguage.value=currentLanguage;els.languageSelect.value=currentLanguage;updateShiftUi();ensureShiftTimer();renderControlCenter();renderPassengerMode();if(pinSecurity.enabled&&pinSecurity.hash)lockApplication();else setTimeout(showStartupReminder,650);document.addEventListener('visibilitychange',()=>{if(document.hidden){appHiddenAt=Date.now();return}const mins=Number(pinSecurity.autoLockMinutes)||0;if(pinSecurity.enabled&&mins>0&&appHiddenAt&&Date.now()-appHiddenAt>=mins*60000)lockApplication('Automatski zaključano nakon povratka u aplikaciju.');appHiddenAt=0});window.addEventListener('online',()=>{refreshDiagnostics();if(appPrefs.autoUpdate!==false)checkForAppUpdate()});window.addEventListener('offline',refreshDiagnostics);if('serviceWorker' in navigator){let reloadingForController=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloadingForController)return;if(sessionStorage.getItem('lanaReloadForUpdate')==='1'&&updateCanReload()){reloadingForController=true;sessionStorage.removeItem('lanaReloadForUpdate');location.reload()}});primeServiceWorker()}scheduleSelfUpdates();document.addEventListener('visibilitychange',()=>{if(!document.hidden&&appPrefs.autoUpdate!==false&&pendingUpdateVersion)applyPendingUpdate()});
+})();
+</script>
+
+<script id="lanaShellScript">
+(() => {
+  const $s=id=>document.getElementById(id);
+  const shell=$s('lanaShell'), menu=$s('shellMenu'), routePanel=$s('shellRoutePanel'), legacyPanel=$s('shellLegacyPanel');
+  if(!shell)return;
+  const defaultBubble='Tu sam za tebe, Charlie. 💙';
+  const speech=$s('shellSpeech'); let bubbleTimer=null;
+  function shellSay(text,{sticky=false}={}){
+    const t=String(text||'').replace(/\s+/g,' ').trim();
+    if(!t||/^(Tiha sam\.|I am quiet\.|Čekam [“\"]Molim te Lana)/i.test(t)){speech.hidden=true; speech.classList.remove('show'); return}
+    speech.textContent=t; speech.hidden=false; speech.classList.add('show');
+    clearTimeout(bubbleTimer); if(!sticky)bubbleTimer=setTimeout(()=>{speech.hidden=true;speech.classList.remove('show')},9000);
+  }
+  function closeMenu(){menu.hidden=true}
+  function openMenu(){menu.hidden=false;routePanel.hidden=true;legacyPanel.hidden=true}
+  $s('shellMenuToggle').addEventListener('click',()=>menu.hidden?openMenu():closeMenu());
+  $s('shellMenuClose').addEventListener('click',closeMenu);
+  $s('shellRouteClose').addEventListener('click',()=>routePanel.hidden=true);
+  $s('shellLegacyClose').addEventListener('click',()=>legacyPanel.hidden=true);
+  function openRoute(mode='route'){
+    closeMenu();legacyPanel.hidden=true;routePanel.hidden=false;
+    const deal=mode==='deal';$s('shellRouteTab').classList.toggle('active',!deal);$s('shellDealTab').classList.toggle('active',deal);$s('shellRouteMode').hidden=deal;$s('shellDealMode').hidden=!deal;$s('shellRouteTitle').textContent=deal?'🤝 Nagodba':'📍 Procjena A → B';
+    if(!deal){$s('shellFrom').value=$s('from')?.value||'Moja trenutna lokacija';$s('shellTo').value=$s('to')?.value||'';$s('shellPassengers').value=$s('passengers')?.value||'4'}
+    else{$s('shellDealPrice').value=$s('dealPrice')?.value||''}
+  }
+  $s('shellRouteTab').addEventListener('click',()=>openRoute('route'));$s('shellDealTab').addEventListener('click',()=>openRoute('deal'));
+  $s('shellUseLocation').addEventListener('click',()=>{$s('shellFrom').value='Moja trenutna lokacija';if($s('from'))$s('from').value='Moja trenutna lokacija';shellSay('Koristit ću tvoju trenutačnu lokaciju kao polazište.');});
+  $s('shellCalculate').addEventListener('click',()=>{
+    const from=$s('shellFrom').value.trim()||'Moja trenutna lokacija',to=$s('shellTo').value.trim();if(!to){$s('shellRouteStatus').textContent='Upiši odredište.';return}
+    if($s('from'))$s('from').value=from;if($s('to'))$s('to').value=to;if($s('passengers'))$s('passengers').value=$s('shellPassengers').value;$s('modeTariff')?.click();
+    $s('shellRouteStatus').textContent='Računam rutu i cijenu…';$s('shellRouteResult').hidden=true;$s('calculate')?.click();
+  });
+  $s('shellConfirmDeal').addEventListener('click',()=>{const v=Number($s('shellDealPrice').value);if(!(v>0)){$s('shellRouteStatus').textContent='Upiši dogovorenu cijenu.';return}$s('modeDeal')?.click();if($s('dealPrice'))$s('dealPrice').value=String(v);$s('confirmDeal')?.click();setTimeout(syncRouteResult,40)});
+  function syncRouteResult(){
+    const rc=$s('resultCard'),p=$s('price'),ri=$s('routeInfo'),st=$s('status');if(st?.textContent)$s('shellRouteStatus').textContent=st.textContent;
+    if(rc&&!rc.hidden&&p?.textContent){$s('shellRoutePrice').textContent=p.textContent;$s('shellRouteInfo').textContent=ri?.textContent||'';$s('shellRouteResult').hidden=false}
+  }
+  ['resultCard','price','routeInfo','status'].forEach(id=>{const el=$s(id);if(el)new MutationObserver(syncRouteResult).observe(el,{attributes:true,childList:true,subtree:true,characterData:true})});
+  $s('shellStartTrip').addEventListener('click',()=>{$s('startTrip')?.click();routePanel.hidden=true});
+  $s('shellNavigate').addEventListener('click',()=>{const dest=$s('shellTo').value.trim()||$s('to')?.value?.trim();if(!dest){$s('shellRouteStatus').textContent='Nema odredišta za navigaciju.';return}const u='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(dest)+'&travelmode=driving&dir_action=navigate';location.href=u});
+  document.querySelectorAll('[data-shell-click]').forEach(b=>b.addEventListener('click',()=>{closeMenu();routePanel.hidden=true;legacyPanel.hidden=true;$s(b.dataset.shellClick)?.click()}));
+  document.querySelectorAll('[data-shell-action]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.shellAction;if(a==='route'||a==='deal'){openRoute(a);return}if(['help','contacts','tariff'].includes(a))openLegacy(a)}));
+  function findLegacyCard(type){const wanted={help:'Upute za korištenje',contacts:'Jezik i kontakti',tariff:'Postavke cjenika'}[type];return [...document.querySelectorAll('section.card')].find(sec=>sec.querySelector('summary')?.textContent.includes(wanted))||null}
+  function openLegacy(type){closeMenu();routePanel.hidden=true;const old=$s('shellLegacyBody').querySelector('.shell-moved-card');if(old)document.querySelector('body>main')?.appendChild(old);const card=findLegacyCard(type);if(!card){shellSay('Taj alat trenutačno ne mogu otvoriti.');return}card.classList.add('shell-moved-card');$s('shellLegacyBody').replaceChildren(card);$s('shellLegacyTitle').textContent={help:'❓ Upute za korištenje',contacts:'🌍 Jezik i kontakti',tariff:'🚕 Postavke cjenika'}[type];legacyPanel.hidden=false;card.querySelector('details')?.setAttribute('open','')}
+  function directGreeting(key){const lang=$s('appLanguage')?.value||'hr';if($s('passengerLanguage'))$s('passengerLanguage').value=lang;const btn=document.querySelector(`[data-passenger-message="${key}"]`);btn?.click();}
+  document.querySelectorAll('[data-greet]').forEach(b=>b.addEventListener('click',()=>directGreeting(b.dataset.greet)));
+  $s('shellMic').addEventListener('click',()=>{$s('toggleAssistant')?.click()});
+  $s('shellVoiceCore').addEventListener('click',()=>{if($s('toggleAssistant')?.textContent?.includes('Uključi'))$s('toggleAssistant').click();shellSay('Slušam. Reci: “Molim te Lana…” 💙',{sticky:false})});
+  $s('shellShift').addEventListener('click',()=>{$s('openShiftPanel')?.click()});
+  $s('shellTaxi').addEventListener('click',()=>openRoute('route'));
+  $s('shellPassenger').addEventListener('click',()=>{$s('openPassengerPanel')?.click()});
+  function syncPermanentStatus(){
+    const pill=$s('assistantPill')?.textContent||'',state=$s('assistantState')?.textContent||'';const micOn=!($s('toggleAssistant')?.textContent||'').includes('Uključi');$s('shellMicSmall').textContent=micOn?'uključen':'isključen';$s('shellMic').classList.toggle('active',micOn);$s('shellLiveStatus').classList.toggle('listening',pill.includes('SLUŠAM'));$s('shellReadyText').textContent=pill.includes('SLUŠAM')?'Lana sluša':micOn?'Lana je spremna':'Lana je tiha';
+    const sh=$s('shiftPill')?.textContent||'NEMA SMJENE';$s('shellShiftSmall').textContent=sh.toLowerCase();$s('shellShift').classList.toggle('active',sh==='AKTIVNA'||sh==='PAUZA');
+    const pm=$s('passengerModeBadge')?.textContent||'ISKLJUČEN';$s('shellPassengerSmall').textContent=pm.toLowerCase();$s('shellPassenger').classList.toggle('active',pm.includes('UKLJUČ'));
+  }
+  ['assistantPill','assistantState','toggleAssistant','shiftPill','passengerModeBadge'].forEach(id=>{const e=$s(id);if(e)new MutationObserver(syncPermanentStatus).observe(e,{childList:true,subtree:true,attributes:true})});
+  const ast=$s('assistantStatus');if(ast)new MutationObserver(()=>{const t=ast.textContent.trim();if(t)shellSay(t)}).observe(ast,{childList:true,subtree:true,characterData:true});
+  const startup=$s('startupOverlay');if(startup)new MutationObserver(()=>{if(!startup.hidden){setTimeout(()=>{const warn=startup.querySelector('.startup-item.warn')?.textContent||startup.querySelector('.startup-item')?.textContent||'';startup.hidden=true;if(warn)shellSay(warn,{sticky:false})},25)}}).observe(startup,{attributes:true,attributeFilter:['hidden']});
+  // If CRM/reservation prepares a ride through the old engine, surface the A→B shell automatically.
+  document.addEventListener('click',e=>{if(e.target.closest('.client-ride'))setTimeout(()=>openRoute('route'),80);if(e.target.closest('.reservation-start'))setTimeout(()=>{const deal=!!($s('dealPrice')?.value&&Number($s('dealPrice').value)>0);openRoute(deal?'deal':'route');syncRouteResult()},100)},true);
+  function tick(){const d=new Date();$s('shellClock').textContent=d.toLocaleTimeString('hr-HR',{hour:'2-digit',minute:'2-digit'})}tick();setInterval(tick,30000);syncPermanentStatus();syncRouteResult();
 })();
 </script>
 </body>
