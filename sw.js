@@ -5,7 +5,7 @@ const APP_SHELL = [
   '/manifest.webmanifest',
   '/icon-192.png',
   '/icon-512.png',
-  '/logo-1024.png',
+  
   '/version.json'
 ];
 
