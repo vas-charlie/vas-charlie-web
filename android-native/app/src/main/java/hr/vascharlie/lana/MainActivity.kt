@@ -3,6 +3,7 @@ package hr.vascharlie.lana
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.speech.tts.Voice
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -46,7 +47,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         if (ttsReady) {
             val candidates = engine.voices
                 ?.filter { it.locale.language == "hr" }
-                ?.sortedWith(compareBy<TextToSpeech.Voice> { it.isNetworkConnectionRequired }.thenBy { it.name })
+                ?.sortedWith(compareBy<Voice> { it.isNetworkConnectionRequired }.thenBy { it.name })
                 ?: emptyList()
             val offline = candidates.firstOrNull { !it.isNetworkConnectionRequired }
             if (offline != null) engine.voice = offline
