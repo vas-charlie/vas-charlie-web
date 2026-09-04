@@ -4,59 +4,139 @@
     'HVALA NA POVJERENJU',
     'DA NIJE VAS, NE BI BILO NI MENE!!'
   ];
+  const ENTER_CLASSES = ['from-left','from-top','from-right','from-bottom'];
 
-  function install() {
+  function installReliablePassengerSpeech(){
+    if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) return;
+
+    let speechToken = 0;
+    let keepAliveTimer = null;
+
+    function stopKeepAlive(){
+      if (keepAliveTimer) clearInterval(keepAliveTimer);
+      keepAliveTimer = null;
+    }
+
+    function splitSpeech(text){
+      const normalized = String(text || '').replace(/\s+/g,' ').trim();
+      if (!normalized) return [];
+      const sentences = normalized.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [normalized];
+      const chunks = [];
+      for (const sentence of sentences) {
+        const s = sentence.trim();
+        if (s.length <= 105) { chunks.push(s); continue; }
+        const words = s.split(' ');
+        let part = '';
+        for (const word of words) {
+          const next = part ? part + ' ' + word : word;
+          if (next.length > 95 && part) { chunks.push(part); part = word; }
+          else part = next;
+        }
+        if (part) chunks.push(part);
+      }
+      return chunks;
+    }
+
+    window.speakPassengerText = function(text, lang){
+      const chunks = splitSpeech(text);
+      if (!chunks.length) return;
+
+      speechToken += 1;
+      const token = speechToken;
+      stopKeepAlive();
+      window.speechSynthesis.cancel();
+
+      try {
+        window.lanaSpeaking = true;
+        window.lastSpokenText = String(text || '');
+      } catch {}
+
+      let index = 0;
+      const finish = () => {
+        if (token !== speechToken) return;
+        stopKeepAlive();
+        try {
+          window.lanaSpeaking = false;
+          window.lastSpokenText = '';
+          window.ignoreSpeechUntil = Date.now() + 1000;
+        } catch {}
+      };
+
+      const speakNext = () => {
+        if (token !== speechToken) return;
+        if (index >= chunks.length) { finish(); return; }
+        const utterance = new SpeechSynthesisUtterance(chunks[index++]);
+        const voiceMap = window.LANG_VOICE || {};
+        utterance.lang = voiceMap[lang] || (lang === 'hr' ? 'hr-HR' : 'en-US');
+        utterance.rate = 0.94;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+        utterance.onend = () => setTimeout(speakNext, 90);
+        utterance.onerror = (event) => {
+          if (event && (event.error === 'interrupted' || event.error === 'canceled')) return;
+          setTimeout(speakNext, 120);
+        };
+        window.speechSynthesis.speak(utterance);
+      };
+
+      keepAliveTimer = setInterval(() => {
+        if (token !== speechToken) { stopKeepAlive(); return; }
+        if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+          window.speechSynthesis.pause();
+          setTimeout(() => { if (token === speechToken) window.speechSynthesis.resume(); }, 60);
+        }
+      }, 9000);
+
+      setTimeout(speakNext, 80);
+    };
+  }
+
+  function installPassengerBrandMessages() {
     if (document.getElementById('charliePassengerMessage')) return;
 
     const style = document.createElement('style');
     style.id = 'charlieHotfix097Style';
     style.textContent = `
-      .lana-portrait{
-        animation:charlieLanaPresence 8s ease-in-out infinite;
-        transform-origin:48% 72%;
-        will-change:transform,filter;
-      }
-      @keyframes charlieLanaPresence{
-        0%,100%{transform:translate3d(0,0,0) scale(1);filter:drop-shadow(0 18px 28px rgba(30,64,175,.10))}
-        50%{transform:translate3d(2px,-3px,0) scale(1.006);filter:drop-shadow(0 20px 30px rgba(30,64,175,.14))}
-      }
+      .lana-portrait{animation:none!important;transform:none!important;filter:none!important}
       #charliePassengerMessage{
         position:absolute;
         z-index:24;
-        top:42%;
-        right:4.5%;
-        width:min(410px,43vw);
-        min-height:150px;
+        left:39%;
+        right:2.5%;
+        top:16%;
+        bottom:30%;
         display:flex;
         align-items:center;
         justify-content:center;
         text-align:center;
-        padding:22px 24px;
-        border-radius:28px;
+        padding:28px 32px;
         color:#12376a;
-        background:rgba(255,255,255,.72);
-        border:1px solid rgba(169,195,228,.55);
-        box-shadow:0 18px 46px rgba(30,64,175,.10);
-        backdrop-filter:blur(10px);
+        background:transparent;
+        border:0;
+        box-shadow:none;
         font-weight:950;
         letter-spacing:.055em;
-        line-height:1.18;
-        font-size:clamp(1.25rem,3.1vw,2.35rem);
+        line-height:1.14;
+        font-size:clamp(1.55rem,4vw,3.45rem);
         opacity:0;
-        transform:translateY(8px) scale(.985);
-        transition:opacity .7s ease,transform .7s ease;
         pointer-events:none;
+        transition:opacity .75s ease, transform .9s cubic-bezier(.2,.8,.2,1);
       }
-      #charliePassengerMessage.show{opacity:1;transform:translateY(0) scale(1)}
-      #charliePassengerMessage.signature{font-size:clamp(1.05rem,2.55vw,1.9rem);letter-spacing:.035em}
+      #charliePassengerMessage.signature{font-size:clamp(1.25rem,3.25vw,2.7rem);letter-spacing:.025em}
+      #charliePassengerMessage.from-left{transform:translateX(-90px) scale(.97)}
+      #charliePassengerMessage.from-right{transform:translateX(90px) scale(.97)}
+      #charliePassengerMessage.from-top{transform:translateY(-70px) scale(.97)}
+      #charliePassengerMessage.from-bottom{transform:translateY(70px) scale(.97)}
+      #charliePassengerMessage.show{opacity:1;transform:translate(0,0) scale(1)}
       @media(max-width:700px){
-        #charliePassengerMessage{right:2.5%;width:39vw;min-height:112px;padding:16px 14px;border-radius:22px;top:39%}
+        #charliePassengerMessage{left:36%;right:2%;top:14%;bottom:31%;padding:18px 16px;font-size:clamp(1.2rem,4.6vw,2.35rem)}
+        #charliePassengerMessage.signature{font-size:clamp(1rem,3.9vw,1.95rem)}
       }
       @media(max-width:430px){
-        #charliePassengerMessage{right:2%;width:43vw;min-height:92px;padding:12px 10px;font-size:clamp(.9rem,4.2vw,1.2rem);top:38%}
-        #charliePassengerMessage.signature{font-size:clamp(.78rem,3.6vw,1.02rem)}
+        #charliePassengerMessage{left:42%;right:1.5%;top:16%;bottom:32%;padding:12px 8px;font-size:clamp(.95rem,4.7vw,1.4rem)}
+        #charliePassengerMessage.signature{font-size:clamp(.82rem,3.9vw,1.16rem)}
       }
-      @media(prefers-reduced-motion:reduce){.lana-portrait{animation:none!important}#charliePassengerMessage{transition:none}}
+      @media(prefers-reduced-motion:reduce){#charliePassengerMessage{transition:opacity .2s ease;transform:none!important}}
     `;
     document.head.appendChild(style);
 
@@ -67,18 +147,27 @@
     stage.appendChild(box);
 
     let i = 0;
+    let direction = 0;
     const show = () => {
-      box.classList.remove('show');
+      box.classList.remove('show', ...ENTER_CLASSES);
+      const enterClass = ENTER_CLASSES[direction % ENTER_CLASSES.length];
+      direction += 1;
+      box.classList.add(enterClass);
       setTimeout(() => {
         box.textContent = MESSAGES[i];
         box.classList.toggle('signature', i === 2);
-        box.classList.add('show');
+        requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add('show')));
         i = (i + 1) % MESSAGES.length;
-      }, 650);
+      }, 520);
     };
 
     show();
-    setInterval(show, 5200);
+    setInterval(show, 5600);
+  }
+
+  function install(){
+    installReliablePassengerSpeech();
+    installPassengerBrandMessages();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install, {once:true});
