@@ -1,6 +1,6 @@
 {
-  "version": "0.9.7-hotfix4",
+  "version": "0.9.7-hotfix5",
   "released": "2026-09-04",
   "channel": "dev",
-  "note": "Sporije i elegantnije brendirane poruke s animacijom slova te pouzdaniji puni izgovor pozdrava putnicima na Androidu."
+  "note": "Putnički pozdravi presreću se izravno i čitaju kao cijele kratke rečenice u redu, bez starog prekidanja. Sve tri VAŠ CHARLIE poruke ulaze kao cjelina iz različitih smjerova, polako se centriraju i imaju suptilnu animaciju slova."
 }
