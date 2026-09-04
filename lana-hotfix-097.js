@@ -4,95 +4,96 @@
     'HVALA NA POVJERENJU',
     'DA NIJE VAS, NE BI BILO NI MENE!!'
   ];
-  const ENTER_CLASSES = ['from-left','from-top','from-right','from-bottom'];
 
-  function installReliablePassengerSpeech(){
-    if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) return;
-
-    let speechToken = 0;
-    let keepAliveTimer = null;
-
-    function stopKeepAlive(){
-      if (keepAliveTimer) clearInterval(keepAliveTimer);
-      keepAliveTimer = null;
-    }
-
-    function splitSpeech(text){
-      const normalized = String(text || '').replace(/\s+/g,' ').trim();
-      if (!normalized) return [];
-      const sentences = normalized.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [normalized];
-      const chunks = [];
-      for (const sentence of sentences) {
-        const s = sentence.trim();
-        if (s.length <= 105) { chunks.push(s); continue; }
-        const words = s.split(' ');
-        let part = '';
-        for (const word of words) {
-          const next = part ? part + ' ' + word : word;
-          if (next.length > 95 && part) { chunks.push(part); part = word; }
-          else part = next;
-        }
-        if (part) chunks.push(part);
+  function splitIntoSafeChunks(text){
+    const normalized = String(text || '').replace(/\s+/g,' ').trim();
+    if (!normalized) return [];
+    const units = normalized.match(/[^,;:.!?]+[,;:.!?]+|[^,;:.!?]+$/g) || [normalized];
+    const chunks = [];
+    for (const raw of units) {
+      const unit = raw.trim();
+      if (!unit) continue;
+      if (unit.length <= 48) { chunks.push(unit); continue; }
+      const words = unit.split(' ');
+      let part = '';
+      for (const word of words) {
+        const next = part ? part + ' ' + word : word;
+        if (next.length > 44 && part) { chunks.push(part); part = word; }
+        else part = next;
       }
-      return chunks;
+      if (part) chunks.push(part);
     }
+    return chunks;
+  }
 
-    window.speakPassengerText = function(text, lang){
-      const chunks = splitSpeech(text);
-      if (!chunks.length) return;
+  function installSpeechSynthesisGuard(){
+    const synth = window.speechSynthesis;
+    if (!synth || !window.SpeechSynthesisUtterance || synth.__charlieGuardInstalled) return;
+    synth.__charlieGuardInstalled = true;
 
-      speechToken += 1;
-      const token = speechToken;
-      stopKeepAlive();
-      window.speechSynthesis.cancel();
+    const nativeSpeak = synth.speak.bind(synth);
+    synth.speak = function(original){
+      if (!original || original.__charlieChunk) return nativeSpeak(original);
+      const text = String(original.text || '').trim();
+      const chunks = splitIntoSafeChunks(text);
+      if (chunks.length <= 1) return nativeSpeak(original);
 
-      try {
-        window.lanaSpeaking = true;
-        window.lastSpokenText = String(text || '');
-      } catch {}
-
-      let index = 0;
-      const finish = () => {
-        if (token !== speechToken) return;
-        stopKeepAlive();
-        try {
-          window.lanaSpeaking = false;
-          window.lastSpokenText = '';
-          window.ignoreSpeechUntil = Date.now() + 1000;
-        } catch {}
-      };
+      let i = 0;
+      let ended = false;
+      const finalEnd = original.onend;
+      const finalError = original.onerror;
 
       const speakNext = () => {
-        if (token !== speechToken) return;
-        if (index >= chunks.length) { finish(); return; }
-        const utterance = new SpeechSynthesisUtterance(chunks[index++]);
-        const voiceMap = window.LANG_VOICE || {};
-        utterance.lang = voiceMap[lang] || (lang === 'hr' ? 'hr-HR' : 'en-US');
-        utterance.rate = 0.94;
-        utterance.pitch = 1;
-        utterance.volume = 1;
-        utterance.onend = () => setTimeout(speakNext, 90);
-        utterance.onerror = (event) => {
-          if (event && (event.error === 'interrupted' || event.error === 'canceled')) return;
-          setTimeout(speakNext, 120);
+        if (i >= chunks.length) {
+          if (!ended) {
+            ended = true;
+            try { if (typeof finalEnd === 'function') finalEnd.call(original, new Event('end')); } catch {}
+          }
+          return;
+        }
+
+        const u = new SpeechSynthesisUtterance(chunks[i++]);
+        u.__charlieChunk = true;
+        try { u.lang = original.lang || 'hr-HR'; } catch {}
+        try { u.rate = original.rate || 1; } catch {}
+        try { u.pitch = original.pitch || 1; } catch {}
+        try { u.volume = original.volume ?? 1; } catch {}
+        try { if (original.voice) u.voice = original.voice; } catch {}
+
+        let watchdog = setTimeout(() => {
+          watchdog = null;
+          try { synth.cancel(); } catch {}
+          setTimeout(speakNext, 80);
+        }, 6500);
+
+        u.onend = () => {
+          if (watchdog) clearTimeout(watchdog);
+          setTimeout(speakNext, 90);
         };
-        window.speechSynthesis.speak(utterance);
+        u.onerror = (ev) => {
+          if (watchdog) clearTimeout(watchdog);
+          const err = ev && ev.error;
+          if (err === 'canceled' || err === 'interrupted') {
+            setTimeout(speakNext, 120);
+            return;
+          }
+          if (i < chunks.length) setTimeout(speakNext, 120);
+          else if (!ended) {
+            ended = true;
+            try { if (typeof finalError === 'function') finalError.call(original, ev); } catch {}
+          }
+        };
+        nativeSpeak(u);
       };
 
-      keepAliveTimer = setInterval(() => {
-        if (token !== speechToken) { stopKeepAlive(); return; }
-        if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-          window.speechSynthesis.pause();
-          setTimeout(() => { if (token === speechToken) window.speechSynthesis.resume(); }, 60);
-        }
-      }, 9000);
-
-      setTimeout(speakNext, 80);
+      speakNext();
     };
   }
 
-  function installPassengerBrandMessages() {
-    if (document.getElementById('charliePassengerMessage')) return;
+  function installPassengerBrandMessages(){
+    const old = document.getElementById('charliePassengerMessage');
+    if (old) old.remove();
+    document.getElementById('charlieHotfix097Style')?.remove();
 
     const style = document.createElement('style');
     style.id = 'charlieHotfix097Style';
@@ -101,15 +102,15 @@
       #charliePassengerMessage{
         position:absolute;
         z-index:24;
-        left:39%;
-        right:2.5%;
-        top:16%;
-        bottom:30%;
+        left:31%;
+        right:0;
+        top:8%;
+        bottom:28%;
         display:flex;
         align-items:center;
         justify-content:center;
         text-align:center;
-        padding:28px 32px;
+        padding:30px 42px;
         color:#12376a;
         background:transparent;
         border:0;
@@ -117,26 +118,23 @@
         font-weight:950;
         letter-spacing:.055em;
         line-height:1.14;
-        font-size:clamp(1.55rem,4vw,3.45rem);
+        font-size:clamp(1.65rem,4.2vw,3.7rem);
         opacity:0;
         pointer-events:none;
-        transition:opacity .75s ease, transform .9s cubic-bezier(.2,.8,.2,1);
+        will-change:transform,opacity;
       }
-      #charliePassengerMessage.signature{font-size:clamp(1.25rem,3.25vw,2.7rem);letter-spacing:.025em}
-      #charliePassengerMessage.from-left{transform:translateX(-90px) scale(.97)}
-      #charliePassengerMessage.from-right{transform:translateX(90px) scale(.97)}
-      #charliePassengerMessage.from-top{transform:translateY(-70px) scale(.97)}
-      #charliePassengerMessage.from-bottom{transform:translateY(70px) scale(.97)}
-      #charliePassengerMessage.show{opacity:1;transform:translate(0,0) scale(1)}
+      #charliePassengerMessage.signature{
+        font-size:clamp(1.3rem,3.35vw,2.85rem);
+        letter-spacing:.025em;
+      }
       @media(max-width:700px){
-        #charliePassengerMessage{left:36%;right:2%;top:14%;bottom:31%;padding:18px 16px;font-size:clamp(1.2rem,4.6vw,2.35rem)}
-        #charliePassengerMessage.signature{font-size:clamp(1rem,3.9vw,1.95rem)}
+        #charliePassengerMessage{left:29%;right:0;top:7%;bottom:29%;padding:20px 22px;font-size:clamp(1.25rem,4.8vw,2.45rem)}
+        #charliePassengerMessage.signature{font-size:clamp(1rem,4vw,2rem)}
       }
       @media(max-width:430px){
-        #charliePassengerMessage{left:42%;right:1.5%;top:16%;bottom:32%;padding:12px 8px;font-size:clamp(.95rem,4.7vw,1.4rem)}
-        #charliePassengerMessage.signature{font-size:clamp(.82rem,3.9vw,1.16rem)}
+        #charliePassengerMessage{left:38%;right:0;top:10%;bottom:30%;padding:12px 10px;font-size:clamp(.95rem,4.8vw,1.45rem)}
+        #charliePassengerMessage.signature{font-size:clamp(.82rem,3.9vw,1.15rem)}
       }
-      @media(prefers-reduced-motion:reduce){#charliePassengerMessage{transition:opacity .2s ease;transform:none!important}}
     `;
     document.head.appendChild(style);
 
@@ -146,27 +144,46 @@
     box.setAttribute('aria-live','polite');
     stage.appendChild(box);
 
-    let i = 0;
-    let direction = 0;
-    const show = () => {
-      box.classList.remove('show', ...ENTER_CLASSES);
-      const enterClass = ENTER_CLASSES[direction % ENTER_CLASSES.length];
-      direction += 1;
-      box.classList.add(enterClass);
-      setTimeout(() => {
-        box.textContent = MESSAGES[i];
-        box.classList.toggle('signature', i === 2);
-        requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add('show')));
-        i = (i + 1) % MESSAGES.length;
-      }, 520);
-    };
+    const directions = [
+      'translate3d(-34vw,0,0) scale(.96)',
+      'translate3d(0,-28vh,0) scale(.96)',
+      'translate3d(34vw,0,0) scale(.96)',
+      'translate3d(0,28vh,0) scale(.96)'
+    ];
+    let messageIndex = 0;
+    let directionIndex = 0;
+    let timer = null;
 
-    show();
-    setInterval(show, 5600);
+    function nextMessage(){
+      const currentMessage = messageIndex;
+      const currentDirection = directionIndex;
+      messageIndex = (messageIndex + 1) % MESSAGES.length;
+      directionIndex = (directionIndex + 1) % directions.length;
+
+      box.textContent = MESSAGES[currentMessage];
+      box.classList.toggle('signature', currentMessage === 2);
+      box.style.transition = 'none';
+      box.style.opacity = '0';
+      box.style.transform = directions[currentDirection];
+      void box.offsetWidth;
+      box.style.transition = 'opacity .72s ease, transform .95s cubic-bezier(.2,.8,.2,1)';
+      requestAnimationFrame(() => {
+        box.style.opacity = '1';
+        box.style.transform = 'translate3d(0,0,0) scale(1)';
+      });
+
+      setTimeout(() => {
+        box.style.opacity = '0';
+      }, 3500);
+      timer = setTimeout(nextMessage, 4300);
+    }
+
+    nextMessage();
+    window.addEventListener('pagehide',()=>{ if(timer) clearTimeout(timer); },{once:true});
   }
 
   function install(){
-    installReliablePassengerSpeech();
+    installSpeechSynthesisGuard();
     installPassengerBrandMessages();
   }
 
