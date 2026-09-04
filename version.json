@@ -1,6 +1,6 @@
 {
-  "version": "0.9.7-hotfix3",
+  "version": "0.9.7-hotfix4",
   "released": "2026-09-04",
   "channel": "dev",
-  "note": "Pouzdaniji završetak glasovnih pozdrava na Androidu i kruženje sve tri VAŠ CHARLIE poruke kroz cijeli prazan prostor iz različitih smjerova."
+  "note": "Sporije i elegantnije brendirane poruke s animacijom slova te pouzdaniji puni izgovor pozdrava putnicima na Androidu."
 }
