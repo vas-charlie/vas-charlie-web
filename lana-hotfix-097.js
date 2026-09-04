@@ -1,98 +1,128 @@
 (() => {
-  const MESSAGES = [
+  const BRAND_MESSAGES = [
     'VAŠ CHARLIE',
     'HVALA NA POVJERENJU',
     'DA NIJE VAS, NE BI BILO NI MENE!!'
   ];
 
-  function splitIntoSafeChunks(text){
-    const normalized = String(text || '').replace(/\s+/g,' ').trim();
-    if (!normalized) return [];
-    const units = normalized.match(/[^,;:.!?]+[,;:.!?]+|[^,;:.!?]+$/g) || [normalized];
-    const chunks = [];
-    for (const raw of units) {
-      const unit = raw.trim();
-      if (!unit) continue;
-      if (unit.length <= 48) { chunks.push(unit); continue; }
-      const words = unit.split(' ');
+  const HR_FALLBACK = {
+    standard:'{greeting} i dobrodošli. Hvala vam što ste odabrali VAŠ CHARLIE. Želim vam ugodnu vožnju.',
+    warm:'{greeting}. Smjestite se udobno. Ako vam nešto zatreba tijekom vožnje, slobodno recite. Želim vam ugodnu vožnju.',
+    short:'{greeting} i dobrodošli. Želim vam ugodnu vožnju.',
+    returning:'{greeting} i dobrodošli ponovno. Drago mi je što ste opet s VAŠ CHARLIE. Želim vam ugodnu vožnju.',
+    exit:'Hvala vam na vožnji i povjerenju. Ako želite, nakon vožnje slobodno ostavite iskrenu recenziju. Želim vam sretan nastavak dana.'
+  };
+
+  const FIELD_BY_KEY = {
+    standard:'passengerMsgStandard', warm:'passengerMsgWarm', short:'passengerMsgShort',
+    returning:'passengerMsgReturning', top:'passengerMsgTop', exit:'passengerMsgExit'
+  };
+  const LANG_VOICE = {hr:'hr-HR',en:'en-US',de:'de-DE',it:'it-IT',fr:'fr-FR',es:'es-ES'};
+
+  function greetingFor(lang='hr'){
+    const h = new Date().getHours();
+    const slot = h < 11 ? 'morning' : h < 18 ? 'day' : 'evening';
+    const map = {
+      hr:{morning:'Dobro jutro',day:'Dobar dan',evening:'Dobra večer'},
+      en:{morning:'Good morning',day:'Good afternoon',evening:'Good evening'},
+      de:{morning:'Guten Morgen',day:'Guten Tag',evening:'Guten Abend'},
+      it:{morning:'Buongiorno',day:'Buon pomeriggio',evening:'Buonasera'},
+      fr:{morning:'Bonjour',day:'Bonjour',evening:'Bonsoir'},
+      es:{morning:'Buenos días',day:'Buenas tardes',evening:'Buenas noches'}
+    };
+    return (map[lang] || map.hr)[slot];
+  }
+
+  function currentPassengerText(key){
+    const lang = document.getElementById('passengerLanguage')?.value || document.getElementById('appLanguage')?.value || 'hr';
+    let text = '';
+    try {
+      const saved = JSON.parse(localStorage.getItem('lanaPassengerMessagesV01') || '{}');
+      text = String(saved?.[lang]?.[key] || '').trim();
+    } catch {}
+    if (!text) text = String(document.getElementById(FIELD_BY_KEY[key])?.value || '').trim();
+    if (!text && lang === 'hr') text = HR_FALLBACK[key] || '';
+    return {text:text.replaceAll('{greeting}', greetingFor(lang)), lang};
+  }
+
+  function tinySpeechChunks(text){
+    const cleaned = String(text || '').replace(/\s+/g,' ').trim();
+    if (!cleaned) return [];
+    const sentenceBits = cleaned.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [cleaned];
+    const out = [];
+    for (const bit of sentenceBits) {
+      const words = bit.trim().split(/\s+/);
       let part = '';
       for (const word of words) {
         const next = part ? part + ' ' + word : word;
-        if (next.length > 44 && part) { chunks.push(part); part = word; }
+        if (next.length > 30 && part) { out.push(part); part = word; }
         else part = next;
       }
-      if (part) chunks.push(part);
+      if (part) out.push(part);
     }
-    return chunks;
+    return out;
   }
 
-  function installSpeechSynthesisGuard(){
+  let speechRun = 0;
+  function speakPassengerFully(text, lang){
     const synth = window.speechSynthesis;
-    if (!synth || !window.SpeechSynthesisUtterance || synth.__charlieGuardInstalled) return;
-    synth.__charlieGuardInstalled = true;
+    if (!synth || !window.SpeechSynthesisUtterance || !text) return;
+    speechRun += 1;
+    const run = speechRun;
+    synth.cancel();
+    const chunks = tinySpeechChunks(text);
+    let index = 0;
 
-    const nativeSpeak = synth.speak.bind(synth);
-    synth.speak = function(original){
-      if (!original || original.__charlieChunk) return nativeSpeak(original);
-      const text = String(original.text || '').trim();
-      const chunks = splitIntoSafeChunks(text);
-      if (chunks.length <= 1) return nativeSpeak(original);
-
-      let i = 0;
-      let ended = false;
-      const finalEnd = original.onend;
-      const finalError = original.onerror;
-
-      const speakNext = () => {
-        if (i >= chunks.length) {
-          if (!ended) {
-            ended = true;
-            try { if (typeof finalEnd === 'function') finalEnd.call(original, new Event('end')); } catch {}
-          }
-          return;
-        }
-
-        const u = new SpeechSynthesisUtterance(chunks[i++]);
-        u.__charlieChunk = true;
-        try { u.lang = original.lang || 'hr-HR'; } catch {}
-        try { u.rate = original.rate || 1; } catch {}
-        try { u.pitch = original.pitch || 1; } catch {}
-        try { u.volume = original.volume ?? 1; } catch {}
-        try { if (original.voice) u.voice = original.voice; } catch {}
-
-        let watchdog = setTimeout(() => {
-          watchdog = null;
-          try { synth.cancel(); } catch {}
-          setTimeout(speakNext, 80);
-        }, 6500);
-
-        u.onend = () => {
-          if (watchdog) clearTimeout(watchdog);
-          setTimeout(speakNext, 90);
-        };
-        u.onerror = (ev) => {
-          if (watchdog) clearTimeout(watchdog);
-          const err = ev && ev.error;
-          if (err === 'canceled' || err === 'interrupted') {
-            setTimeout(speakNext, 120);
-            return;
-          }
-          if (i < chunks.length) setTimeout(speakNext, 120);
-          else if (!ended) {
-            ended = true;
-            try { if (typeof finalError === 'function') finalError.call(original, ev); } catch {}
-          }
-        };
-        nativeSpeak(u);
+    const say = (retry = 0) => {
+      if (run !== speechRun || index >= chunks.length) return;
+      const chunk = chunks[index];
+      const u = new SpeechSynthesisUtterance(chunk);
+      u.lang = LANG_VOICE[lang] || 'hr-HR';
+      u.rate = 0.88;
+      u.pitch = 1;
+      u.volume = 1;
+      let done = false;
+      const advance = () => {
+        if (done || run !== speechRun) return;
+        done = true;
+        index += 1;
+        setTimeout(() => say(0), 180);
       };
-
-      speakNext();
+      u.onend = advance;
+      u.onerror = () => {
+        if (done || run !== speechRun) return;
+        done = true;
+        if (retry < 2) setTimeout(() => { done = false; say(retry + 1); }, 280);
+        else { index += 1; setTimeout(() => say(0), 220); }
+      };
+      synth.speak(u);
     };
+    setTimeout(() => say(0), 120);
   }
 
-  function installPassengerBrandMessages(){
-    const old = document.getElementById('charliePassengerMessage');
-    if (old) old.remove();
+  function installGreetingCapture(){
+    document.addEventListener('click', (event) => {
+      const b = event.target.closest?.('[data-passenger-message]');
+      if (!b) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const key = b.dataset.passengerMessage;
+      const {text,lang} = currentPassengerText(key);
+      const status = document.getElementById('passengerStatus');
+      if (status) status.textContent = text ? '🔊 ' + text : 'Poruka nije dostupna.';
+      speakPassengerFully(text, lang);
+    }, true);
+  }
+
+  function letterMarkup(text){
+    return [...text].map((ch,i) => {
+      const safe = ch === ' ' ? '&nbsp;' : ch.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return `<span class="charlie-letter" style="--i:${i}">${safe}</span>`;
+    }).join('');
+  }
+
+  function installBrandMessages(){
+    document.getElementById('charliePassengerMessage')?.remove();
     document.getElementById('charlieHotfix097Style')?.remove();
 
     const style = document.createElement('style');
@@ -100,41 +130,32 @@
     style.textContent = `
       .lana-portrait{animation:none!important;transform:none!important;filter:none!important}
       #charliePassengerMessage{
-        position:absolute;
-        z-index:24;
-        left:31%;
-        right:0;
-        top:8%;
-        bottom:28%;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        text-align:center;
-        padding:30px 42px;
-        color:#12376a;
-        background:transparent;
-        border:0;
-        box-shadow:none;
-        font-weight:950;
-        letter-spacing:.055em;
-        line-height:1.14;
-        font-size:clamp(1.65rem,4.2vw,3.7rem);
-        opacity:0;
-        pointer-events:none;
-        will-change:transform,opacity;
+        position:absolute;z-index:24;left:31%;right:0;top:8%;bottom:28%;
+        display:flex;align-items:center;justify-content:center;text-align:center;
+        padding:32px 48px;color:#12376a;background:transparent;border:0;box-shadow:none;
+        font-weight:950;letter-spacing:.05em;line-height:1.18;
+        font-size:clamp(1.65rem,4.15vw,3.65rem);pointer-events:none;
+        opacity:0;transform:translate3d(var(--enter-x,0),var(--enter-y,0),0) scale(.985);
+        filter:blur(3px);
+        transition:opacity 1.6s ease,transform 2.2s cubic-bezier(.18,.78,.22,1),filter 1.8s ease;
       }
-      #charliePassengerMessage.signature{
-        font-size:clamp(1.3rem,3.35vw,2.85rem);
-        letter-spacing:.025em;
+      #charliePassengerMessage.show{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}
+      #charliePassengerMessage.leaving{opacity:0;transform:translate3d(calc(var(--enter-x,0) * -.22),calc(var(--enter-y,0) * -.22),0) scale(.995);filter:blur(2px)}
+      #charliePassengerMessage.signature{font-size:clamp(1.3rem,3.25vw,2.8rem);letter-spacing:.02em;max-width:92%}
+      #charliePassengerMessage .charlie-letter{
+        display:inline-block;opacity:0;transform:translateY(14px) scale(.96);filter:blur(2px);
       }
-      @media(max-width:700px){
-        #charliePassengerMessage{left:29%;right:0;top:7%;bottom:29%;padding:20px 22px;font-size:clamp(1.25rem,4.8vw,2.45rem)}
-        #charliePassengerMessage.signature{font-size:clamp(1rem,4vw,2rem)}
+      #charliePassengerMessage.show .charlie-letter{
+        animation:charlieLetterIn 1.25s cubic-bezier(.2,.8,.2,1) forwards;
+        animation-delay:calc(var(--i) * 55ms + 350ms);
       }
-      @media(max-width:430px){
-        #charliePassengerMessage{left:38%;right:0;top:10%;bottom:30%;padding:12px 10px;font-size:clamp(.95rem,4.8vw,1.45rem)}
-        #charliePassengerMessage.signature{font-size:clamp(.82rem,3.9vw,1.15rem)}
+      @keyframes charlieLetterIn{
+        0%{opacity:0;transform:translateY(14px) rotate(-1.5deg) scale(.96);filter:blur(2px)}
+        60%{opacity:1;transform:translateY(-2px) rotate(.4deg) scale(1.01);filter:blur(.2px)}
+        100%{opacity:1;transform:translateY(0) rotate(0) scale(1);filter:blur(0)}
       }
+      @media(max-width:700px){#charliePassengerMessage{left:29%;top:7%;bottom:29%;padding:22px 26px;font-size:clamp(1.25rem,4.7vw,2.45rem)}#charliePassengerMessage.signature{font-size:clamp(1rem,4vw,2rem)}}
+      @media(max-width:430px){#charliePassengerMessage{left:38%;top:10%;bottom:30%;padding:12px 10px;font-size:clamp(.95rem,4.8vw,1.45rem)}#charliePassengerMessage.signature{font-size:clamp(.82rem,3.9vw,1.15rem)}}
     `;
     document.head.appendChild(style);
 
@@ -145,48 +166,35 @@
     stage.appendChild(box);
 
     const directions = [
-      'translate3d(-34vw,0,0) scale(.96)',
-      'translate3d(0,-28vh,0) scale(.96)',
-      'translate3d(34vw,0,0) scale(.96)',
-      'translate3d(0,28vh,0) scale(.96)'
+      ['-42px','0px'], ['0px','-34px'], ['42px','0px'], ['0px','34px']
     ];
-    let messageIndex = 0;
-    let directionIndex = 0;
-    let timer = null;
+    let mi = 0, di = 0;
 
-    function nextMessage(){
-      const currentMessage = messageIndex;
-      const currentDirection = directionIndex;
-      messageIndex = (messageIndex + 1) % MESSAGES.length;
-      directionIndex = (directionIndex + 1) % directions.length;
+    function cycle(){
+      const text = BRAND_MESSAGES[mi];
+      const [x,y] = directions[di];
+      mi = (mi + 1) % BRAND_MESSAGES.length;
+      di = (di + 1) % directions.length;
 
-      box.textContent = MESSAGES[currentMessage];
-      box.classList.toggle('signature', currentMessage === 2);
-      box.style.transition = 'none';
-      box.style.opacity = '0';
-      box.style.transform = directions[currentDirection];
+      box.className = text === BRAND_MESSAGES[2] ? 'signature' : '';
+      box.style.setProperty('--enter-x', x);
+      box.style.setProperty('--enter-y', y);
+      box.innerHTML = letterMarkup(text);
+      box.classList.remove('show','leaving');
       void box.offsetWidth;
-      box.style.transition = 'opacity .72s ease, transform .95s cubic-bezier(.2,.8,.2,1)';
-      requestAnimationFrame(() => {
-        box.style.opacity = '1';
-        box.style.transform = 'translate3d(0,0,0) scale(1)';
-      });
+      requestAnimationFrame(() => box.classList.add('show'));
 
-      setTimeout(() => {
-        box.style.opacity = '0';
-      }, 3500);
-      timer = setTimeout(nextMessage, 4300);
+      setTimeout(() => box.classList.add('leaving'), 7000);
+      setTimeout(cycle, 9000);
     }
 
-    nextMessage();
-    window.addEventListener('pagehide',()=>{ if(timer) clearTimeout(timer); },{once:true});
+    cycle();
   }
 
   function install(){
-    installSpeechSynthesisGuard();
-    installPassengerBrandMessages();
+    installGreetingCapture();
+    installBrandMessages();
   }
-
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install, {once:true});
   else install();
 })();
