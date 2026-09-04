@@ -1,4 +1,4 @@
-const CACHE = 'lana-static-v0.9.7-hotfix1';
+const CACHE = 'lana-static-v0.9.7-hotfix2';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -6,7 +6,7 @@ const APP_SHELL = [
   '/icon-192.png',
   '/icon-512.png',
   '/lana-shell.webp',
-  '/lana-hotfix-097.js',
+  '/lana-hotfix-097.js?v=097h2',
   '/version.json'
 ];
 
@@ -27,8 +27,8 @@ self.addEventListener('message', event => {
 });
 
 function injectHotfix(html) {
-  if (html.includes('lana-hotfix-097.js')) return html;
-  return html.replace('</body>', '<script src="/lana-hotfix-097.js?v=097h1"></script>\n</body>');
+  html = html.replace(/<script src="\/lana-hotfix-097\.js[^\"]*"><\/script>\s*/g, '');
+  return html.replace('</body>', '<script src="/lana-hotfix-097.js?v=097h2"></script>\n</body>');
 }
 
 self.addEventListener('fetch', event => {
