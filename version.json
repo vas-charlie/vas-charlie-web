@@ -1,6 +1,6 @@
 {
-  "version": "0.9.7-hotfix1",
+  "version": "0.9.7-hotfix2",
   "released": "2026-09-04",
   "channel": "dev",
-  "note": "Vraćene Charliejeve poruke putniku u prazni prostor: VAŠ CHARLIE, HVALA NA POVJERENJU, DA NIJE VAS, NE BI BILO NI MENE!! Dodana suptilna stalna animacija Lanine fotografije."
+  "note": "Ispravljeno potpuno izgovaranje pozdrava putnicima. Charliejeve poruke sada ulaze iz različitih smjerova i centriraju se u cijelom praznom prostoru. Uklonjeno je pomicanje Lanine fotografije; izmjena poza/slika ostaje sljedeći korak."
 }
