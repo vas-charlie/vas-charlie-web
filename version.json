@@ -1,6 +1,6 @@
 {
-  "version": "0.9.0",
-  "released": "2026-08-29",
-  "channel": "stable",
-  "note": "Novi Lana shell: Lana stalno na ekranu, paneli po potrebi, stalni izbornik, pozdravi putnika i donja upravljačka traka."
+  "version": "stable-rebuild-0.1",
+  "released": "2026-09-04",
+  "channel": "preview",
+  "note": "Izolirana testna grana. Produkcija nije mijenjana. Fokus: pouzdan puni izgovor putničkih pozdrava i mirna izmjena sve tri VAŠ CHARLIE poruke bez regresija."
 }
