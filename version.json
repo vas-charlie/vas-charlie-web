@@ -1,6 +1,6 @@
 {
-  "version": "0.9.0",
-  "released": "2026-08-29",
-  "channel": "stable",
-  "note": "Novi Lana shell: Lana stalno na ekranu, paneli po potrebi, stalni izbornik, pozdravi putnika i donja upravljačka traka."
+  "version": "0.9.7-hotfix1",
+  "released": "2026-09-04",
+  "channel": "dev",
+  "note": "Vraćene Charliejeve poruke putniku u prazni prostor: VAŠ CHARLIE, HVALA NA POVJERENJU, DA NIJE VAS, NE BI BILO NI MENE!! Dodana suptilna stalna animacija Lanine fotografije."
 }
