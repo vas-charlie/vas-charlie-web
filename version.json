@@ -1,6 +1,6 @@
 {
-  "version": "0.9.7-hotfix2",
+  "version": "0.9.7-hotfix3",
   "released": "2026-09-04",
   "channel": "dev",
-  "note": "Ispravljeno potpuno izgovaranje pozdrava putnicima. Charliejeve poruke sada ulaze iz različitih smjerova i centriraju se u cijelom praznom prostoru. Uklonjeno je pomicanje Lanine fotografije; izmjena poza/slika ostaje sljedeći korak."
+  "note": "Pouzdaniji završetak glasovnih pozdrava na Androidu i kruženje sve tri VAŠ CHARLIE poruke kroz cijeli prazan prostor iz različitih smjerova."
 }
