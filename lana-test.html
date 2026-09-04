@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lana test — VAŠ CHARLIE</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#12376a;background:#eef5ff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(180deg,#f8fbff,#e8f1ff)}
+main{max-width:900px;margin:auto;padding:16px}
+header{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}h1{font-size:1.05rem;margin:0}.badge{font-size:.78rem;background:#dbeafe;padding:6px 9px;border-radius:999px}
+.stage{position:relative;min-height:48vh;border:1px solid #b8cef0;border-radius:24px;background:white;overflow:hidden;box-shadow:0 12px 35px rgba(24,73,130,.12);display:grid;place-items:center;padding:28px}
+#message{width:100%;text-align:center;font-weight:900;letter-spacing:.045em;line-height:1.18;font-size:clamp(1.5rem,7vw,3.5rem);min-height:5.5em;display:flex;align-items:center;justify-content:center;flex-wrap:wrap}
+.word{display:inline-block;white-space:nowrap;margin:.08em .12em}.letter{display:inline-block;opacity:0;filter:blur(3px);transform:translate(var(--x),var(--y)) scale(.94)}
+.play .letter{animation:settle 1.6s cubic-bezier(.18,.82,.2,1) forwards;animation-delay:calc(var(--i)*85ms)}
+.hold .letter{opacity:1;filter:none;transform:none}.exit .letter{animation:leave 1s ease forwards;animation-delay:calc(var(--ri)*22ms)}
+@keyframes settle{0%{opacity:0;filter:blur(3px);transform:translate(var(--x),var(--y)) scale(.94)}70%{opacity:1;filter:blur(.2px);transform:translate(calc(var(--x)*-.04),calc(var(--y)*-.04)) scale(1.01)}100%{opacity:1;filter:none;transform:none}}
+@keyframes leave{to{opacity:0;filter:blur(2px);transform:translate(calc(var(--x)*-.15),calc(var(--y)*-.15)) scale(.985)}}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}button{min-height:52px;border:0;border-radius:14px;background:#1d4ed8;color:white;font-weight:800;font-size:.95rem;padding:10px}button.secondary{background:#315f9f}button.stop{background:#7f1d1d}.status{margin-top:12px;padding:12px;border-radius:14px;background:#fff;border:1px solid #c7d8ef;min-height:48px;font-size:.9rem;line-height:1.4}
+@media(min-width:700px){.stage{min-height:58vh}.controls{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body><main>
+<header><h1>LANA • izolirani test</h1><span class="badge">ne dira produkciju</span></header>
+<section class="stage"><div id="message" aria-live="polite"></div></section>
+<div class="controls">
+<button data-say="standard">👋 Pozdravi</button>
+<button data-say="warm" class="secondary">🙂 Topli pozdrav</button>
+<button data-say="returning" class="secondary">🔁 Stalni klijent</button>
+<button data-say="exit" class="secondary">👋 Hvala / doviđenja</button>
+<button id="stop" class="stop">■ Zaustavi govor</button>
+</div>
+<div id="status" class="status">Spremno. Dodirni jedan pozdrav za test zvuka.</div>
+</main>
+<script>
+(() => {
+'use strict';
+const MESSAGES=['VAŠ CHARLIE','HVALA NA POVJERENJU','DA NIJE VAS, NE BI BILO NI MENE!!'];
+const TEXT={
+standard:'Dobar dan i dobrodošli. Hvala vam što ste odabrali VAŠ CHARLIE. Želim vam ugodnu vožnju.',
+warm:'Dobar dan. Smjestite se udobno. Ako vam nešto zatreba tijekom vožnje, slobodno recite. Želim vam ugodnu vožnju.',
+returning:'Dobar dan i dobrodošli ponovno. Drago mi je što ste opet s VAŠ CHARLIE. Želim vam ugodnu vožnju.',
+exit:'Hvala vam na vožnji i povjerenju. Ako želite, nakon vožnje slobodno ostavite iskrenu recenziju. Želim vam sretan nastavak dana.'};
+const dirs=[[-120,0],[0,-90],[120,0],[0,90],[-95,-65],[95,65]];const box=document.getElementById('message');const status=document.getElementById('status');let mi=0,di=0,t1,t2,t3;
+function build(text,d){clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);box.className='';box.replaceChildren();let idx=0;const total=[...text.replaceAll(' ','')].length;text.split(' ').forEach(wd=>{const w=document.createElement('span');w.className='word';[...wd].forEach(ch=>{const s=document.createElement('span');s.className='letter';s.textContent=ch;s.style.setProperty('--i',idx);s.style.setProperty('--ri',Math.max(0,total-idx));s.style.setProperty('--x',d[0]+'px');s.style.setProperty('--y',d[1]+'px');idx++;w.appendChild(s)});box.appendChild(w)});requestAnimationFrame(()=>box.classList.add('play'));t1=setTimeout(()=>{box.classList.remove('play');box.classList.add('hold')},4300);t2=setTimeout(()=>{box.classList.remove('hold');box.classList.add('exit')},9000);t3=setTimeout(cycle,10600)}
+function cycle(){build(MESSAGES[mi],dirs[di%dirs.length]);mi=(mi+1)%MESSAGES.length;di++}cycle();
+let active=[];
+function stopSpeech(){try{speechSynthesis.cancel()}catch{}active=[]}
+function speak(text){stopSpeech();if(!('speechSynthesis' in window)||!window.SpeechSynthesisUtterance){status.textContent='❌ Ovaj preglednik ne podržava speechSynthesis.';return}const sentences=text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)?.map(s=>s.trim()).filter(Boolean)||[text];status.textContent='🔊 Govorim: '+text;let completed=0;active=sentences.map((sentence,i)=>{const u=new SpeechSynthesisUtterance(sentence);u.lang='hr-HR';u.rate=.9;u.pitch=1;u.volume=1;u.onstart=()=>{status.textContent=`🔊 Rečenica ${i+1}/${sentences.length}: ${sentence}`};u.onend=()=>{completed++;if(completed===sentences.length)status.textContent='✅ Pozdrav izgovoren do kraja.'};u.onerror=e=>{status.textContent='❌ Greška govora: '+(e.error||'nepoznata')};return u});active.forEach(u=>speechSynthesis.speak(u));}
+document.querySelectorAll('[data-say]').forEach(b=>b.addEventListener('click',()=>speak(TEXT[b.dataset.say])));document.getElementById('stop').addEventListener('click',()=>{stopSpeech();status.textContent='Govor zaustavljen.'});
+})();
+</script></body></html>
