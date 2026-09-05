@@ -8,12 +8,16 @@ import android.speech.tts.Voice
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
+import java.util.ArrayDeque
 import java.util.Locale
 
 class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var webView: WebView
     private var tts: TextToSpeech? = null
     private var ttsReady = false
+    private val pendingSpeech = ArrayDeque<String>()
+    private var speechSession = 0L
+    private var activeUtteranceId: String? = null
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,22 +60,28 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             engine.setPitch(1.02f)
             engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) {
-                    notifyWeb("nativeVoiceSpeaking", "")
+                    if (utteranceId == activeUtteranceId) notifyWeb("nativeVoiceSpeaking", "")
                 }
 
                 override fun onDone(utteranceId: String?) {
-                    if (utteranceId?.endsWith("-last") == true) {
-                        notifyWeb("nativeVoiceDone", "")
+                    if (utteranceId != activeUtteranceId) return
+                    runOnUiThread {
+                        if (pendingSpeech.isEmpty()) {
+                            activeUtteranceId = null
+                            notifyWeb("nativeVoiceDone", "")
+                        } else {
+                            speakNext(engine, speechSession)
+                        }
                     }
                 }
 
                 @Deprecated("Deprecated in Java")
                 override fun onError(utteranceId: String?) {
-                    notifyWeb("nativeVoiceError", "TTS_SPEAK_ERROR")
+                    if (utteranceId == activeUtteranceId) notifyWeb("nativeVoiceError", "TTS_SPEAK_ERROR")
                 }
 
                 override fun onError(utteranceId: String?, errorCode: Int) {
-                    notifyWeb("nativeVoiceError", "TTS_SPEAK_ERROR_$errorCode")
+                    if (utteranceId == activeUtteranceId) notifyWeb("nativeVoiceError", "TTS_SPEAK_ERROR_$errorCode")
                 }
             })
             notifyWeb("nativeVoiceReady", engine.voice?.name ?: "hr-HR")
@@ -96,6 +106,19 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         return if (parts.isEmpty()) listOf(text.trim()) else parts
     }
 
+    private fun speakNext(engine: TextToSpeech, session: Long) {
+        if (session != speechSession || pendingSpeech.isEmpty()) return
+        val chunk = pendingSpeech.removeFirst()
+        val utteranceId = "lana-$session-${System.nanoTime()}"
+        activeUtteranceId = utteranceId
+        val result = engine.speak(chunk, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
+        if (result == TextToSpeech.ERROR) {
+            activeUtteranceId = null
+            pendingSpeech.clear()
+            notifyWeb("nativeVoiceError", "TTS_SPEAK_ERROR")
+        }
+    }
+
     inner class LanaVoiceBridge {
         @JavascriptInterface
         fun isReady(): Boolean = ttsReady
@@ -107,13 +130,12 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
             val chunks = splitForSpeech(text)
             runOnUiThread {
-                engine.stop()
-                chunks.forEachIndexed { index, chunk ->
-                    val isLast = index == chunks.lastIndex
-                    val utteranceId = "lana-${System.currentTimeMillis()}-$index${if (isLast) "-last" else ""}"
-                    val queueMode = if (index == 0) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD
-                    engine.speak(chunk, queueMode, null, utteranceId)
-                }
+                speechSession += 1
+                val session = speechSession
+                pendingSpeech.clear()
+                pendingSpeech.addAll(chunks)
+                activeUtteranceId = null
+                speakNext(engine, session)
             }
             return true
         }
@@ -121,6 +143,9 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         @JavascriptInterface
         fun stop() {
             runOnUiThread {
+                speechSession += 1
+                pendingSpeech.clear()
+                activeUtteranceId = null
                 tts?.stop()
                 notifyWeb("nativeVoiceReady", tts?.voice?.name ?: "hr-HR")
             }
@@ -131,6 +156,9 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     override fun onDestroy() {
+        speechSession += 1
+        pendingSpeech.clear()
+        activeUtteranceId = null
         tts?.stop()
         tts?.shutdown()
         super.onDestroy()
