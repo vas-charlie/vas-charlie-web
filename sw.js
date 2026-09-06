@@ -1,4 +1,4 @@
-const CACHE = 'lana-static-v0.9.7-hotfix5';
+const CACHE = 'lana-static-v0.9.7-hotfix6';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -6,12 +6,15 @@ const APP_SHELL = [
   '/icon-192.png',
   '/icon-512.png',
   '/lana-shell.webp',
-  '/lana-hotfix-097.js?v=097h5',
-  '/version.json'
+  '/lana-hotfix-097.js?v=097h5'
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)));
+  event.waitUntil(
+    caches.open(CACHE)
+      .then(cache => cache.addAll(APP_SHELL))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', event => {
@@ -22,6 +25,7 @@ self.addEventListener('activate', event => {
   );
 });
 
+// Kept for compatibility with older clients that explicitly request activation.
 self.addEventListener('message', event => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
@@ -36,6 +40,13 @@ self.addEventListener('fetch', event => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
+
+  // Update metadata must never come from the app-shell cache. Otherwise an
+  // installed PWA can keep seeing an old version.json and miss a new release.
+  if (url.pathname === '/version.json') {
+    event.respondWith(fetch(new Request(req, {cache: 'no-store'})));
+    return;
+  }
 
   if (req.mode === 'navigate') {
     event.respondWith(
