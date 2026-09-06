@@ -1,6 +1,6 @@
 {
-  "version": "0.9.7-hotfix6",
+  "version": "0.9.8",
   "released": "2026-09-06",
   "channel": "dev",
-  "note": "PWA ažuriranja su pouzdanija: nova verzija service workera odmah preuzima kontrolu, stari cache se čisti, a version.json se uvijek provjerava preko mreže umjesto iz zastarjelog cachea."
+  "note": "Pouzdanija automatska PWA ažuriranja: nova verzija service workera odmah preuzima kontrolu, stari cache se čisti, version.json se provjerava preko mreže, a aktivna aplikacija dobiva točnu verziju iz service workera kako se isto ažuriranje ne bi vrtjelo u krug."
 }
