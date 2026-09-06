@@ -1,0 +1,39 @@
+name: Build Lana Clean APK
+
+on:
+  push:
+    branches:
+      - lana-from-scratch-v1
+    paths:
+      - 'lana-clean/**'
+      - '.github/workflows/lana-clean.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build clean debug APK
+        working-directory: lana-clean
+        run: gradle assembleDebug
+
+      - name: Upload Lana Clean APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: lana-clean-v1
+          path: lana-clean/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
