@@ -1,4 +1,4 @@
-const RELEASE_VERSION = '0.9.7-hotfix6';
+const RELEASE_VERSION = '0.9.8';
 const CACHE = 'lana-static-v' + RELEASE_VERSION;
 const APP_SHELL = [
   '/',
