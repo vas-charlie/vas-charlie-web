@@ -9,7 +9,6 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.speech.tts.Voice;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -57,7 +56,7 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         root.addView(title, new LinearLayout.LayoutParams(-1, -2));
 
         TextView subtitle = new TextView(this);
-        subtitle.setText("VAŠ CHARLIE  •  NOVA APLIKACIJA OD NULE");
+        subtitle.setText("VAŠ CHARLIE  •  CLEAN v2");
         subtitle.setTextColor(Color.rgb(164, 176, 205));
         subtitle.setTextSize(15);
         subtitle.setGravity(Gravity.CENTER);
@@ -121,11 +120,9 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         }
 
         Voice selected = chooseCroatianVoice(tts.getVoices());
-        if (selected != null) {
-            tts.setVoice(selected);
-        }
-        tts.setSpeechRate(0.94f);
-        tts.setPitch(1.02f);
+        if (selected != null) tts.setVoice(selected);
+        tts.setSpeechRate(0.96f);
+        tts.setPitch(1.01f);
 
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
@@ -181,10 +178,15 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
 
         stopEverythingInternal(false);
         session++;
-        String text = timeGreeting() + " i dobrodošli. Hvala vam što ste odabrali Vaš Čarli. Želim vam ugodnu vožnju.";
         speechQueue.clear();
-        speechQueue.addAll(makeSmallChunks(text, 4));
-        status.setText("Lana priprema cijeli pozdrav…");
+
+        // Namjerno režemo samo na prirodnim granicama rečenica.
+        // Nema više rezanja svaka 4 slova/riječi usred fraze.
+        speechQueue.add(timeGreeting() + " i dobrodošli.");
+        speechQueue.add("Hvala vam što ste odabrali Vaš Čarli.");
+        speechQueue.add("Želim vam ugodnu vožnju.");
+
+        status.setText("Lana priprema prirodan pozdrav…");
         synthesizeNext(session);
     }
 
@@ -195,26 +197,6 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
         return "Dobra večer";
     }
 
-    private List<String> makeSmallChunks(String text, int maxWords) {
-        String cleaned = text.trim().replaceAll("\\s+", " ");
-        String[] words = cleaned.split(" ");
-        List<String> chunks = new ArrayList<>();
-        StringBuilder current = new StringBuilder();
-        int count = 0;
-        for (String word : words) {
-            if (count >= maxWords) {
-                chunks.add(current.toString().trim());
-                current.setLength(0);
-                count = 0;
-            }
-            if (current.length() > 0) current.append(' ');
-            current.append(word);
-            count++;
-        }
-        if (current.length() > 0) chunks.add(current.toString().trim());
-        return chunks;
-    }
-
     private void synthesizeNext(long expectedSession) {
         if (expectedSession != session) return;
         if (speechQueue.isEmpty()) {
@@ -222,14 +204,12 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
             return;
         }
 
-        String chunk = speechQueue.removeFirst();
+        String sentence = speechQueue.removeFirst();
         activeFile = new File(getCacheDir(), "lana_" + expectedSession + "_" + System.nanoTime() + ".wav");
         Bundle params = new Bundle();
         String utteranceId = "lana:" + expectedSession + ":" + System.nanoTime();
-        int result = tts.synthesizeToFile(chunk, params, activeFile, utteranceId);
-        if (result == TextToSpeech.ERROR) {
-            showError("SYNTHESIZE_TO_FILE_FAILED");
-        }
+        int result = tts.synthesizeToFile(sentence, params, activeFile, utteranceId);
+        if (result == TextToSpeech.ERROR) showError("SYNTHESIZE_TO_FILE_FAILED");
     }
 
     private void playActiveFile(long expectedSession) {
