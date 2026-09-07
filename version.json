@@ -1,6 +1,6 @@
 {
-  "version": "0.9.17",
+  "version": "0.9.18",
   "released": "2026-09-07",
   "channel": "dev",
-  "note": "Izolirana vizualna dorada samo modula Lana Glazba. U rezultatima pretrage glavne radnje su sada stalno i jasno istaknute kao Pusti, Spremi i Preuzmi. Naziv Sačuvaj zamijenjen je jasnijim Spremi. Preuzmi ostaje vidljiv i kada izvor ne dopušta offline download, tada je onemogućen uz objašnjenje; ako je pjesma već offline prikazuje se Preuzeto. Tabovi Traži, Spremljeno i Preuzeto ostaju dostupni, ali su vizualno manji kako bi akcije nad pjesmom bile prioritet. Nisu mijenjani internet pretraga, offline baza, TTS, jezici, pozdravi, pronunciation logika ni animacije."
+  "note": "Izolirana nadogradnja samo glazbene pretrage. Ako prvi upit vrati premalo ili slabo podudarne rezultate, Lana automatski pokušava varijante pisanja i traženje bez početnih riječi koje često predstavljaju izvođača, uključujući regionalne varijante poput što/šta i mjesto/mesto. Apple katalog se dodatno pokušava i kroz drugi storefront kada je potrebno, a Internet Archive upit se širi na više varijanti u jednom pozivu. Rezultati se spajaju, uklanjaju duplikati i poredaju prema podudarnosti s originalnim upitom. Tekst objašnjenja pretrage je skraćen. Pusti, Spremi, Preuzmi, offline baza, TTS, jezici, pozdravi, pronunciation logika i animacije nisu mijenjani."
 }
