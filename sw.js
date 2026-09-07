@@ -1,4 +1,4 @@
-const RELEASE_VERSION = '0.9.8';
+const RELEASE_VERSION = '0.9.9';
 const CACHE = 'lana-static-v' + RELEASE_VERSION;
 const APP_SHELL = [
   '/',
@@ -7,7 +7,8 @@ const APP_SHELL = [
   '/icon-192.png',
   '/icon-512.png',
   '/lana-shell.webp',
-  '/lana-hotfix-097.js?v=097h5'
+  '/lana-hotfix-097.js?v=097h5',
+  '/lana-profit-voice-099.js?v=099'
 ];
 
 self.addEventListener('install', event => {
@@ -32,12 +33,16 @@ self.addEventListener('message', event => {
 });
 
 function injectHotfix(html) {
-  // The main HTML still carries an older hard-coded APP_VERSION. Keep the
-  // running app aligned with the release served by this service worker so the
-  // self-update checker does not repeatedly treat the same release as new.
+  // Keep the running app aligned with the release served by this service
+  // worker so the self-update checker does not repeatedly treat the same
+  // release as new.
   html = html.replace(/const APP_VERSION='[^']*';/, `const APP_VERSION='${RELEASE_VERSION}';`);
   html = html.replace(/<script src="\/lana-hotfix-097\.js[^\"]*"><\/script>\s*/g, '');
-  return html.replace('</body>', '<script src="/lana-hotfix-097.js?v=097h5"></script>\n</body>');
+  html = html.replace(/<script src="\/lana-profit-voice-099\.js[^\"]*"><\/script>\s*/g, '');
+  return html.replace(
+    '</body>',
+    '<script src="/lana-hotfix-097.js?v=097h5"></script>\n<script src="/lana-profit-voice-099.js?v=099"></script>\n</body>'
+  );
 }
 
 self.addEventListener('fetch', event => {
