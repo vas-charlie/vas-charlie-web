@@ -1,6 +1,6 @@
 {
-  "version": "0.9.15",
+  "version": "0.9.16",
   "released": "2026-09-07",
   "channel": "dev",
-  "note": "Dodana je prva izolirana verzija modula Lana Glazba. Player se otvara iz izbornika Lane i podržava play/pause, prethodnu i sljedeću pjesmu, glasnoću, seek/progress, prikaz trenutne pjesme, red reprodukcije, odabir više audio datoteka s uređaja te dodavanje izravnih audio/stream poveznica. Ako uređaj podržava Media Session, osnovne kontrole rade i kroz sistemske media kontrole. TTS, jezici, pozdravi i animacije nisu mijenjani."
+  "note": "Nova izolirana verzija Lana Glazbe. Glazbena ikona je stalno vidljiva na glavnom ekranu. Player sada ima Traži, Spremljeno i Preuzeto; lokalne audio datoteke i dopušteni izravni downloadi spremaju se u IndexedDB za offline slušanje. Internet pretraga kombinira tvoju lokalnu biblioteku, katalog s previewima te otvoreno licencirane audio izvore; cijeli download nudi se samo kada izvor pruža dopušten izravni audio. Spremljeno i Preuzeto ostaju odvojene kategorije. Dodan je i window.LanaMusic API kao priprema za kasnije glasovne naredbe, bez diranja postojećeg TTS-a, jezika, pozdrava ili animacija."
 }
