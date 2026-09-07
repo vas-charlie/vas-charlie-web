@@ -1,6 +1,6 @@
 {
-  "version": "0.9.13",
+  "version": "0.9.14",
   "released": "2026-09-07",
   "channel": "dev",
-  "note": "Nova izolirana animacija poruka u praznom prostoru: poruke polagano ulaze iz osam smjerova, centriraju se, ostaju 6–8 sekundi, slova se lagano poigravaju, a zatim poruka izlazi u drugom smjeru od onoga iz kojeg je došla. Govor, jezici i pozdravi nisu mijenjani."
+  "note": "Dorađena samo vizualna animacija brend poruka. Poruka sada kreće stvarno s ruba ekrana i polagano putuje do izračunate sredine praznog prostora desno od Lane. Zadržava se 6,5–8 sekundi, slova se izraženije poigravaju valovima, poskocima, nagibom i laganim skaliranjem, a zatim cijela poruka polagano odlazi prema drugom rubu. Govor, jezici, pozdravi i izgovor Charlie/Čarli nisu mijenjani."
 }
