@@ -128,6 +128,7 @@
 
   function animateLettersOut(letters){
     letters.forEach((el,i)=>{
+      el.getAnimations().forEach(a=>a.cancel());
       const side = i%2===0 ? -1 : 1;
       el.animate([
         {opacity:1, transform:'translate3d(0,0,0) rotate(0deg)'},
@@ -170,7 +171,7 @@
 
     animateLettersIn(letters);
 
-    const playTimer = setTimeout(()=>animateLettersPlay(letters,holdMs), ENTER_MS-350);
+    const playTimer = setTimeout(()=>animateLettersPlay(letters,holdMs), ENTER_MS+100);
 
     const exitTimer = setTimeout(()=>{
       if(!box?.isConnected) return;
