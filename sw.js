@@ -1,4 +1,4 @@
-const RELEASE_VERSION = '0.9.9';
+const RELEASE_VERSION = '0.9.10';
 const CACHE = 'lana-static-v' + RELEASE_VERSION;
 const APP_SHELL = [
   '/',
@@ -8,7 +8,8 @@ const APP_SHELL = [
   '/icon-512.png',
   '/lana-shell.webp',
   '/lana-hotfix-097.js?v=097h5',
-  '/lana-profit-voice-099.js?v=099'
+  '/lana-profit-voice-099.js?v=099',
+  '/lana-pronunciation-0910.js?v=0910'
 ];
 
 self.addEventListener('install', event => {
@@ -27,21 +28,18 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Kept for compatibility with older clients that explicitly request activation.
 self.addEventListener('message', event => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 function injectHotfix(html) {
-  // Keep the running app aligned with the release served by this service
-  // worker so the self-update checker does not repeatedly treat the same
-  // release as new.
   html = html.replace(/const APP_VERSION='[^']*';/, `const APP_VERSION='${RELEASE_VERSION}';`);
   html = html.replace(/<script src="\/lana-hotfix-097\.js[^\"]*"><\/script>\s*/g, '');
   html = html.replace(/<script src="\/lana-profit-voice-099\.js[^\"]*"><\/script>\s*/g, '');
+  html = html.replace(/<script src="\/lana-pronunciation-0910\.js[^\"]*"><\/script>\s*/g, '');
   return html.replace(
     '</body>',
-    '<script src="/lana-hotfix-097.js?v=097h5"></script>\n<script src="/lana-profit-voice-099.js?v=099"></script>\n</body>'
+    '<script src="/lana-hotfix-097.js?v=097h5"></script>\n<script src="/lana-profit-voice-099.js?v=099"></script>\n<script src="/lana-pronunciation-0910.js?v=0910"></script>\n</body>'
   );
 }
 
@@ -51,8 +49,6 @@ self.addEventListener('fetch', event => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
 
-  // Update metadata must never come from the app-shell cache. Otherwise an
-  // installed PWA can keep seeing an old version.json and miss a new release.
   if (url.pathname === '/version.json') {
     event.respondWith(fetch(new Request(req, {cache: 'no-store'})));
     return;
