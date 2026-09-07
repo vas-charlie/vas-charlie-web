@@ -1,6 +1,6 @@
 {
-  "version": "0.9.10",
+  "version": "0.9.11",
   "released": "2026-09-07",
   "channel": "dev",
-  "note": "Ispravljen izgovor brenda u govornim porukama: Lana više ne slovka CHARLIE, nego u govoru izgovara Čarli. Vizualni naziv VAŠ CHARLIE ostaje nepromijenjen."
+  "note": "Dodana brza promjena jezika putničkih pozdrava izravno uz brze poruke. Jezik se bira bez ulaska u postavke i pamti se za sljedeće korištenje; dostupni su hrvatski, engleski, njemački, talijanski, francuski i španjolski."
 }
