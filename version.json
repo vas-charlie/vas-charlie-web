@@ -1,6 +1,6 @@
 {
-  "version": "0.9.16",
+  "version": "0.9.17",
   "released": "2026-09-07",
   "channel": "dev",
-  "note": "Nova izolirana verzija Lana Glazbe. Glazbena ikona je stalno vidljiva na glavnom ekranu. Player sada ima Traži, Spremljeno i Preuzeto; lokalne audio datoteke i dopušteni izravni downloadi spremaju se u IndexedDB za offline slušanje. Internet pretraga kombinira tvoju lokalnu biblioteku, katalog s previewima te otvoreno licencirane audio izvore; cijeli download nudi se samo kada izvor pruža dopušten izravni audio. Spremljeno i Preuzeto ostaju odvojene kategorije. Dodan je i window.LanaMusic API kao priprema za kasnije glasovne naredbe, bez diranja postojećeg TTS-a, jezika, pozdrava ili animacija."
+  "note": "Izolirana vizualna dorada samo modula Lana Glazba. U rezultatima pretrage glavne radnje su sada stalno i jasno istaknute kao Pusti, Spremi i Preuzmi. Naziv Sačuvaj zamijenjen je jasnijim Spremi. Preuzmi ostaje vidljiv i kada izvor ne dopušta offline download, tada je onemogućen uz objašnjenje; ako je pjesma već offline prikazuje se Preuzeto. Tabovi Traži, Spremljeno i Preuzeto ostaju dostupni, ali su vizualno manji kako bi akcije nad pjesmom bile prioritet. Nisu mijenjani internet pretraga, offline baza, TTS, jezici, pozdravi, pronunciation logika ni animacije."
 }
