@@ -1,6 +1,6 @@
 {
-  "version": "0.9.9",
+  "version": "0.9.10",
   "released": "2026-09-07",
   "channel": "dev",
-  "note": "Glasovna procjena isplativosti vožnje: Lana razumije ponuđeni iznos, prazni dolazak, kilometre s putnikom, prazni povratak i ukupno vrijeme iz prirodne rečenice. Ako nešto nedostaje, pita samo za taj podatak i zatim pokreće postojeći izračun stvarne isplativosti. Dodan je i gumb 'Reci ponudu' kao brzi glasovni ulaz."
+  "note": "Ispravljen izgovor brenda u govornim porukama: Lana više ne slovka CHARLIE, nego u govoru izgovara Čarli. Vizualni naziv VAŠ CHARLIE ostaje nepromijenjen."
 }
