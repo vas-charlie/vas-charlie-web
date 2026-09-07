@@ -1,6 +1,6 @@
 {
-  "version": "0.9.8",
-  "released": "2026-09-06",
+  "version": "0.9.9",
+  "released": "2026-09-07",
   "channel": "dev",
-  "note": "Pouzdanija automatska PWA ažuriranja: nova verzija service workera odmah preuzima kontrolu, stari cache se čisti, version.json se provjerava preko mreže, a aktivna aplikacija dobiva točnu verziju iz service workera kako se isto ažuriranje ne bi vrtjelo u krug."
+  "note": "Glasovna procjena isplativosti vožnje: Lana razumije ponuđeni iznos, prazni dolazak, kilometre s putnikom, prazni povratak i ukupno vrijeme iz prirodne rečenice. Ako nešto nedostaje, pita samo za taj podatak i zatim pokreće postojeći izračun stvarne isplativosti. Dodan je i gumb 'Reci ponudu' kao brzi glasovni ulaz."
 }
