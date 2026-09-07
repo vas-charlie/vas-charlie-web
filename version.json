@@ -1,6 +1,6 @@
 {
-  "version": "0.9.14",
+  "version": "0.9.15",
   "released": "2026-09-07",
   "channel": "dev",
-  "note": "Dorađena samo vizualna animacija brend poruka. Poruka sada kreće stvarno s ruba ekrana i polagano putuje do izračunate sredine praznog prostora desno od Lane. Zadržava se 6,5–8 sekundi, slova se izraženije poigravaju valovima, poskocima, nagibom i laganim skaliranjem, a zatim cijela poruka polagano odlazi prema drugom rubu. Govor, jezici, pozdravi i izgovor Charlie/Čarli nisu mijenjani."
+  "note": "Dodana je prva izolirana verzija modula Lana Glazba. Player se otvara iz izbornika Lane i podržava play/pause, prethodnu i sljedeću pjesmu, glasnoću, seek/progress, prikaz trenutne pjesme, red reprodukcije, odabir više audio datoteka s uređaja te dodavanje izravnih audio/stream poveznica. Ako uređaj podržava Media Session, osnovne kontrole rade i kroz sistemske media kontrole. TTS, jezici, pozdravi i animacije nisu mijenjani."
 }
