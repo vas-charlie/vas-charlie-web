@@ -1,6 +1,6 @@
 {
-  "version": "0.9.11",
+  "version": "0.9.12",
   "released": "2026-09-07",
   "channel": "dev",
-  "note": "Dodana brza promjena jezika putničkih pozdrava izravno uz brze poruke. Jezik se bira bez ulaska u postavke i pamti se za sljedeće korištenje; dostupni su hrvatski, engleski, njemački, talijanski, francuski i španjolski."
+  "note": "Ispravljen izgovor imena/brenda ovisno o jeziku govora: hrvatski glas govori Čarli, dok engleski i ostali strani glasovi dobivaju Charlie u obliku koji TTS prirodno izgovara, bez slovkanja i bez hrvatskog zapisa unutar stranog glasa."
 }
