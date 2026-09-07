@@ -1,4 +1,4 @@
-const RELEASE_VERSION = '0.9.12';
+const RELEASE_VERSION = '0.9.13';
 const CACHE = 'lana-static-v' + RELEASE_VERSION;
 const APP_SHELL = [
   '/',
@@ -10,7 +10,8 @@ const APP_SHELL = [
   '/lana-hotfix-097.js?v=097h5',
   '/lana-profit-voice-099.js?v=099',
   '/lana-pronunciation-0910.js?v=0912',
-  '/lana-quick-language-0911.js?v=0911'
+  '/lana-quick-language-0911.js?v=0911',
+  '/lana-brand-motion-0913.js?v=0913'
 ];
 
 self.addEventListener('install', event => {
@@ -39,9 +40,10 @@ function injectHotfix(html) {
   html = html.replace(/<script src="\/lana-profit-voice-099\.js[^\"]*"><\/script>\s*/g, '');
   html = html.replace(/<script src="\/lana-pronunciation-0910\.js[^\"]*"><\/script>\s*/g, '');
   html = html.replace(/<script src="\/lana-quick-language-0911\.js[^\"]*"><\/script>\s*/g, '');
+  html = html.replace(/<script src="\/lana-brand-motion-0913\.js[^\"]*"><\/script>\s*/g, '');
   return html.replace(
     '</body>',
-    '<script src="/lana-hotfix-097.js?v=097h5"></script>\n<script src="/lana-profit-voice-099.js?v=099"></script>\n<script src="/lana-pronunciation-0910.js?v=0912"></script>\n<script src="/lana-quick-language-0911.js?v=0911"></script>\n</body>'
+    '<script src="/lana-hotfix-097.js?v=097h5"></script>\n<script src="/lana-profit-voice-099.js?v=099"></script>\n<script src="/lana-pronunciation-0910.js?v=0912"></script>\n<script src="/lana-quick-language-0911.js?v=0911"></script>\n<script src="/lana-brand-motion-0913.js?v=0913"></script>\n</body>'
   );
 }
 
