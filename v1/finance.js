@@ -1,4 +1,0 @@
-const DB='vc-os-finance';const STORE='entries';
-function db(){return new Promise((res,rej)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>r.result.createObjectStore(STORE,{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
-export async function addEntry(entry){const d=await db();return new Promise((res,rej)=>{const tx=d.transaction(STORE,'readwrite');tx.objectStore(STORE).put({...entry,id:entry.id||crypto.randomUUID(),createdAt:new Date().toISOString()});tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})}
-export async function totals(){const d=await db();return new Promise((res,rej)=>{const r=d.transaction(STORE).objectStore(STORE).getAll();r.onsuccess=()=>{const a=r.result.reduce((x,e)=>{if(e.type==='income')x.income+=Number(e.amount)||0;else x.cost+=Number(e.amount)||0;return x},{income:0,cost:0});a.net=a.income-a.cost;res(a)};r.onerror=()=>rej(r.error)})}
