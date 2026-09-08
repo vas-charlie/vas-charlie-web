@@ -38,7 +38,8 @@ self.addEventListener('message', event => {
 });
 
 function injectHotfix(html) {
-  html = html.replace(/const APP_VERSION='[^']*';/, `const APP_VERSION='${RELEASE_VERSION}';`);
+  html = html.replace(/const\s+APP_VERSION\s*=\s*['"][^'"]*['"]\s*;/, `const APP_VERSION='${RELEASE_VERSION}';`);
+  html = html.replace(/\bLANA\s+v0\.9\.0\b/g, `LANA v${RELEASE_VERSION}`);
   html = html.replace(/<script src="\/lana-hotfix-097\.js[^\"]*"><\/script>\s*/g, '');
   html = html.replace(/<script src="\/lana-profit-voice-099\.js[^\"]*"><\/script>\s*/g, '');
   html = html.replace(/<script src="\/lana-pronunciation-0910\.js[^\"]*"><\/script>\s*/g, '');
