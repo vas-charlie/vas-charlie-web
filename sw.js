@@ -1,4 +1,4 @@
-const RELEASE_VERSION = '0.9.18';
+const RELEASE_VERSION = '0.9.19';
 const CACHE = 'lana-static-v' + RELEASE_VERSION;
 const APP_SHELL = [
   '/',
@@ -30,6 +30,10 @@ self.addEventListener('activate', event => {
     caches.keys()
       .then(keys => Promise.all(keys.filter(key => key.startsWith('lana-static-') && key !== CACHE).map(key => caches.delete(key))))
       .then(() => self.clients.claim())
+      .then(async () => {
+        const clients = await self.clients.matchAll({type: 'window', includeUncontrolled: false});
+        await Promise.all(clients.map(client => client.navigate(client.url)));
+      })
   );
 });
 
