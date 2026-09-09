@@ -1,7 +1,6 @@
 import { getAll, replaceAll } from './db.js';
 
 const stores=['shifts','trips','transactions'];
-const esc=x=>String(x??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
 
 async function snapshot(){
   const data={schema:2,app:'VAŠ CHARLIE OS',version:'1.0.0',createdAt:new Date().toISOString(),stores:{}};
@@ -16,8 +15,18 @@ async function snapshot(){
   return data;
 }
 
-async function restore(data){
+function validateBackup(data){
   if(!data||![1,2].includes(data.schema)||data.app!=='VAŠ CHARLIE OS'||!data.stores)throw new Error('Neispravna sigurnosna kopija');
+  for(const store of stores){
+    if(!Array.isArray(data.stores[store]))throw new Error(`Neispravna sigurnosna kopija: ${store}`);
+    if(data.stores[store].some(row=>!row||typeof row!=='object'||typeof row.id!=='string'||!row.id.trim()))throw new Error(`Neispravan zapis u backupu: ${store}`);
+  }
+  if(data.schema>=2&&data.local!==undefined&&(!data.local||typeof data.local!=='object'))throw new Error('Neispravne postavke u backupu');
+  return true;
+}
+
+async function restore(data){
+  validateBackup(data);
   await replaceAll(data.stores);
   if(data.schema>=2&&data.local){
     const keys=['vc-active-shift','vc-active-trip','vc-last-trip','vc-language','vc-last-destination'];
@@ -25,7 +34,7 @@ async function restore(data){
       'vc-active-shift':'activeShift','vc-active-trip':'activeTrip','vc-last-trip':'lastTrip',
       'vc-language':'language','vc-last-destination':'destination'
     };
-    for(const key of keys){localStorage.removeItem(key);const value=data.local[map[key]];if(value!==null&&value!==undefined)localStorage.setItem(key,value)}
+    for(const key of keys){localStorage.removeItem(key);const value=data.local[map[key]];if(value!==null&&value!==undefined)localStorage.setItem(key,String(value))}
   }
 }
 
