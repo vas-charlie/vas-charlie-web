@@ -1,4 +1,5 @@
 import { getAll, replaceAll } from './db.js';
+import './payment-ui.js';
 
 const stores=['shifts','trips','transactions'];
 
