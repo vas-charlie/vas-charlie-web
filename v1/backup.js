@@ -1,19 +1,31 @@
-import { getAll, put } from './db.js';
+import { getAll, replaceAll } from './db.js';
 
 const stores=['shifts','trips','transactions'];
 const esc=x=>String(x??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
 
 async function snapshot(){
-  const data={schema:1,app:'VAŠ CHARLIE OS',createdAt:new Date().toISOString(),stores:{}};
+  const data={schema:2,app:'VAŠ CHARLIE OS',version:'1.0.0',createdAt:new Date().toISOString(),stores:{}};
   for(const store of stores)data.stores[store]=await getAll(store);
+  data.local={
+    activeShift:localStorage.getItem('vc-active-shift'),
+    activeTrip:localStorage.getItem('vc-active-trip'),
+    lastTrip:localStorage.getItem('vc-last-trip'),
+    language:localStorage.getItem('vc-language'),
+    destination:localStorage.getItem('vc-last-destination')
+  };
   return data;
 }
 
 async function restore(data){
-  if(!data||data.schema!==1||!data.stores)throw new Error('Neispravna sigurnosna kopija');
-  for(const store of stores){
-    const rows=Array.isArray(data.stores[store])?data.stores[store]:[];
-    for(const row of rows)if(row&&row.id)await put(store,row);
+  if(!data||![1,2].includes(data.schema)||data.app!=='VAŠ CHARLIE OS'||!data.stores)throw new Error('Neispravna sigurnosna kopija');
+  await replaceAll(data.stores);
+  if(data.schema>=2&&data.local){
+    const keys=['vc-active-shift','vc-active-trip','vc-last-trip','vc-language','vc-last-destination'];
+    const map={
+      'vc-active-shift':'activeShift','vc-active-trip':'activeTrip','vc-last-trip':'lastTrip',
+      'vc-language':'language','vc-last-destination':'destination'
+    };
+    for(const key of keys){localStorage.removeItem(key);const value=data.local[map[key]];if(value!==null&&value!==undefined)localStorage.setItem(key,value)}
   }
 }
 
@@ -23,7 +35,7 @@ function init(){
   if(!main||!settings)return;
   const card=document.createElement('section');
   card.className='card';
-  card.innerHTML='<h2>💾 Sigurnosna kopija</h2><p class="sub">Izvezi ili vrati lokalne smjene, vožnje i financije. Podaci ostaju na uređaju dok ih ne izvezeš.</p><div class="grid"><button id="backupExport" class="secondary">Izvezi backup</button><label class="file"><input id="backupImport" type="file" accept="application/json,.json" hidden><button type="button" id="backupChoose" class="secondary">Vrati backup</button></label></div><div id="backupStatus" class="log"></div>';
+  card.innerHTML='<h2>💾 Sigurnosna kopija</h2><p class="sub">Izvezi ili vrati lokalne smjene, vožnje, financije i osnovne postavke.</p><div class="grid"><button id="backupExport" class="secondary">Izvezi backup</button><label class="file"><input id="backupImport" type="file" accept="application/json,.json" hidden><button type="button" id="backupChoose" class="secondary">Vrati backup</button></label></div><div id="backupStatus" class="log"></div>';
   main.insertBefore(card,settings);
   const status=document.getElementById('backupStatus');
   document.getElementById('backupExport').onclick=async()=>{
