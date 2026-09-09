@@ -2,5 +2,5 @@
   "app": "VAŠ CHARLIE OS",
   "lana": "1.0.0",
   "schema": 2,
-  "build": "rebuild-v1"
+  "build": "rebuild-v1-routing"
 }
