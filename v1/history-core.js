@@ -1,4 +1,4 @@
-import { getAll, getByShift } from './db.js';
+import { getAll } from './db.js';
 
 const sum=(rows,type)=>rows.filter(x=>x.type===type).reduce((n,x)=>n+(Number(x.amount)||0),0);
 
