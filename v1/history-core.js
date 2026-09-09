@@ -21,10 +21,10 @@ export async function kpis(){
   const shifts=await getAll('shifts');
   const trips=await getAll('trips');
   const transactions=await getAll('transactions');
-  const now=new Date();
-  const day=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const week=new Date(day); week.setDate(day.getDate()-6);
-  const month=new Date(now.getFullYear(),now.getMonth(),1);
+  const now=Date.now();
+  const day=new Date(now-24*60*60*1000);
+  const week=new Date(now-7*24*60*60*1000);
+  const month=new Date(new Date().getFullYear(),new Date().getMonth(),1);
   const calc=start=>{
     const min=start.getTime();
     const ts=transactions.filter(x=>Date.parse(x.createdAt)>=min);
