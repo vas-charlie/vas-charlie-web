@@ -3,6 +3,7 @@ import { saveTrip } from './offline-core.js';
 import { getShift, startShift, endShift, shiftMinutes } from './shift-core.js';
 import { addTransaction, listTransactions, summarize } from './finance-core.js';
 import { installPackage, packageInfo, route, resolveDestination } from './route-core.js';
+import './messages-ui.js';
 const APP_VERSION='1.0.0';
 const state={running:false,paused:false,startedAt:0,pausedAt:0,lastPosition:null,totalMeters:0,watchId:null,timerId:null,shiftTimerId:null};
 const $=id=>document.getElementById(id); const lang=()=>getLanguage(); const t=k=>LANGUAGES[lang()]?.strings[k]||LANGUAGES.hr.strings[k]||k;
