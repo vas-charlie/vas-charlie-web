@@ -1,13 +1,14 @@
 import { put, getByShift, getAll, uid } from './db.js';
 export const INCOME_SOURCES=['Uber','Bolt','Taxi','Napojnica','Ostalo'];
 export const EXPENSE_CATEGORIES=['Troškovi u smjeni','Privatni troškovi','Poslovni troškovi','Projekt troškovi'];
-export async function addTransaction({type,amount,source,category,note='',shiftId=null,paymentMethod='',tripId=null}){
+export async function addTransaction({type,amount,source,category,note='',shiftId=null,tripId=null,paymentMethod=''}){
   const value=Number(String(amount).replace(',','.'));
   if(!Number.isFinite(value)||value<=0)throw new Error('Iznos mora biti veći od 0');
   if(!['income','expense'].includes(type))throw new Error('Neispravna vrsta transakcije');
   if(type==='income'&&!INCOME_SOURCES.includes(source))throw new Error('Neispravan izvor prihoda');
   if(type==='expense'&&!EXPENSE_CATEGORIES.includes(category))throw new Error('Neispravna kategorija troška');
-  const result=await put('transactions',{id:uid(),type,amount:Math.round(value*100)/100,currency:'EUR',source:type==='income'?source:'',category:type==='expense'?category:'',note:String(note||'').trim(),shiftId,tripId,paymentMethod,createdAt:new Date().toISOString()});
+  const method=String(paymentMethod||((typeof window!=='undefined'&&window.vcPaymentMethod)||'')).trim();
+  const result=await put('transactions',{id:uid(),type,amount:Math.round(value*100)/100,currency:'EUR',source:type==='income'?source:'',category:type==='expense'?category:'',note:String(note||'').trim(),shiftId,tripId,paymentMethod:method,createdAt:new Date().toISOString()});
   window.dispatchEvent(new CustomEvent('vc-finance-changed'));
   return result;
 }
