@@ -1,10 +1,13 @@
 {
-  "name":"VAŠ CHARLIE OS",
-  "short_name":"Charlie OS",
+  "name":"VAŠ CHARLIE OS • Lana v1.0",
+  "short_name":"Lana v1.0",
   "start_url":"./",
   "display":"standalone",
   "background_color":"#070b14",
-  "theme_color":"#0b1020",
+  "theme_color":"#7c3aed",
   "lang":"hr",
-  "scope":"./"
+  "scope":"./",
+  "icons":[
+    {"src":"icon-nova-lana.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
 }
