@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Public SEO pages
+Allow: /taxi-osijek/
+Allow: /taksi-osijek/
+
+Sitemap: https://vas-charlie.vercel.app/sitemap.xml
