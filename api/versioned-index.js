@@ -13,6 +13,9 @@ export default async function handler(req, res) {
     html = html.replace(/Lana v0\.9\.0/g, 'Lana v0.9.19');
     html = html.replace(/v0\.9\.0/g, 'v0.9.19');
 
+    const seoNav = `\n<nav aria-label="Taxi Osijek" style="max-width:760px;margin:28px auto 0;padding:12px 16px;text-align:center;font:600 14px system-ui,sans-serif"><a href="/taxi-osijek/" style="margin:0 10px">Taxi Osijek</a><a href="/taksi-osijek/" style="margin:0 10px">Taksi Osijek</a></nav>\n`;
+    html = html.replace(/<\/body>/i, `${seoNav}</body>`);
+
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store, max-age=0');
     res.setHeader('X-Lana-Version', '0.9.19');
