@@ -1,10 +1,13 @@
 {
-  "name":"VAŠ CHARLIE OS",
-  "short_name":"Charlie OS",
-  "start_url":"./",
+  "name":"VAŠ CHARLIE OS • Nova Lana",
+  "short_name":"VAŠ CHARLIE",
+  "description":"VAŠ CHARLIE OS 1.0 taxi assistant",
+  "start_url":"/nova",
+  "scope":"/",
   "display":"standalone",
+  "orientation":"portrait",
   "background_color":"#070b14",
   "theme_color":"#0b1020",
   "lang":"hr",
-  "scope":"./"
+  "categories":["business","travel","utilities"]
 }
