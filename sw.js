@@ -1,4 +1,5 @@
-const CACHE = 'lana-static-v0.9.0';
+const RELEASE_VERSION = '0.9.19';
+const CACHE = 'lana-static-v' + RELEASE_VERSION;
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -6,11 +7,22 @@ const APP_SHELL = [
   '/icon-192.png',
   '/icon-512.png',
   '/lana-shell.webp',
-  '/version.json'
+  '/lana-hotfix-097.js?v=097h5',
+  '/lana-profit-voice-099.js?v=099',
+  '/lana-pronunciation-0910.js?v=0912',
+  '/lana-quick-language-0911.js?v=0911',
+  '/lana-brand-motion-0914.js?v=0914',
+  '/lana-music-0916.js?v=0916',
+  '/lana-music-actions-0917.js?v=0917',
+  '/lana-music-search-0918.js?v=0918'
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)));
+  event.waitUntil(
+    caches.open(CACHE)
+      .then(cache => cache.addAll(APP_SHELL))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', event => {
@@ -18,6 +30,10 @@ self.addEventListener('activate', event => {
     caches.keys()
       .then(keys => Promise.all(keys.filter(key => key.startsWith('lana-static-') && key !== CACHE).map(key => caches.delete(key))))
       .then(() => self.clients.claim())
+      .then(async () => {
+        const clients = await self.clients.matchAll({type: 'window', includeUncontrolled: false});
+        await Promise.all(clients.map(client => client.navigate(client.url)));
+      })
   );
 });
 
@@ -25,24 +41,65 @@ self.addEventListener('message', event => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
+function injectHotfix(html) {
+  html = html.replace(/const\s+APP_VERSION\s*=\s*['"][^'"]*['"]\s*;/, `const APP_VERSION='${RELEASE_VERSION}';`);
+  html = html.replace(/\bLANA\s+v0\.9\.0\b/g, `LANA v${RELEASE_VERSION}`);
+  html = html.replace(/<script src="\/lana-hotfix-097\.js[^\"]*"><\/script>\s*/g, '');
+  html = html.replace(/<script src="\/lana-profit-voice-099\.js[^\"]*"><\/script>\s*/g, '');
+  html = html.replace(/<script src="\/lana-pronunciation-0910\.js[^\"]*"><\/script>\s*/g, '');
+  html = html.replace(/<script src="\/lana-quick-language-0911\.js[^\"]*"><\/script>\s*/g, '');
+  html = html.replace(/<script src="\/lana-brand-motion-0913\.js[^\"]*"><\/script>\s*/g, '');
+  html = html.replace(/<script src="\/lana-brand-motion-0914\.js[^\"]*"><\/script>\s*/g, '');
+  html = html.replace(/<script src="\/lana-music-0915\.js[^\"]*"><\/script>\s*/g, '');
+  html = html.replace(/<script src="\/lana-music-0916\.js[^\"]*"><\/script>\s*/g, '');
+  html = html.replace(/<script src="\/lana-music-actions-0917\.js[^\"]*"><\/script>\s*/g, '');
+  html = html.replace(/<script src="\/lana-music-search-0918\.js[^\"]*"><\/script>\s*/g, '');
+  return html.replace(
+    '</body>',
+    '<script src="/lana-hotfix-097.js?v=097h5"></script>\n<script src="/lana-profit-voice-099.js?v=099"></script>\n<script src="/lana-pronunciation-0910.js?v=0912"></script>\n<script src="/lana-quick-language-0911.js?v=0911"></script>\n<script src="/lana-brand-motion-0914.js?v=0914"></script>\n<script src="/lana-music-0916.js?v=0916"></script>\n<script src="/lana-music-actions-0917.js?v=0917"></script>\n<script src="/lana-music-search-0918.js?v=0918"></script>\n</body>'
+  );
+}
+
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
-  if (req.mode === 'navigate') {
-    event.respondWith(fetch(req).then(res => {
-      const copy = res.clone();
-      caches.open(CACHE).then(cache => cache.put('/index.html', copy));
-      return res;
-    }).catch(() => caches.match('/index.html')));
+
+  if (url.pathname === '/version.json') {
+    event.respondWith(fetch(new Request(req, {cache: 'no-store'})));
     return;
   }
-  event.respondWith(caches.match(req).then(cached => {
-    const network = fetch(req).then(res => {
-      if (res.ok) caches.open(CACHE).then(cache => cache.put(req, res.clone()));
-      return res;
-    }).catch(() => cached);
-    return cached || network;
-  }));
+
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req).then(async res => {
+        if (!res.ok) return res;
+        const type = res.headers.get('content-type') || '';
+        if (!type.includes('text/html')) return res;
+        const html = injectHotfix(await res.text());
+        const headers = new Headers(res.headers);
+        headers.set('content-type', 'text/html; charset=utf-8');
+        const patched = new Response(html, {status: res.status, statusText: res.statusText, headers});
+        caches.open(CACHE).then(cache => cache.put('/index.html', patched.clone()));
+        return patched;
+      }).catch(async () => {
+        const cached = await caches.match('/index.html');
+        if (!cached) return Response.error();
+        const html = injectHotfix(await cached.text());
+        return new Response(html, {headers:{'content-type':'text/html; charset=utf-8'}});
+      })
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(req).then(cached => {
+      const network = fetch(req).then(res => {
+        if (res.ok) caches.open(CACHE).then(cache => cache.put(req, res.clone()));
+        return res;
+      }).catch(() => cached);
+      return cached || network;
+    })
+  );
 });
